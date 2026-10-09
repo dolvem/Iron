@@ -1,0 +1,28 @@
+# D57: cabecera SPDX en cada fichero.
+# SPDX-FileCopyrightText: 2026 dolvem
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# D48: schemas/ y .tool-versions se versionan, no entran aquí.
+# docs/ no sube al repositorio: el plan de desarrollo se queda local.
+docs/
+
+*.iml
+.gradle/
+.idea/
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# Credenciales de firma (D54): la clave no entra en el repo.
+*.jks
+*.keystore
+keystore.properties
+
+# Artefactos
+*.apk
+app/release/
+
+local.properties
+
+.DS_Store

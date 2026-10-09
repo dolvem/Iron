@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2026 dolvem
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# D49: un solo job check, en push y pull_request. CI no firma: genera el APK unsigned.
+name: check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # actions/checkout v5
+
+      - name: Setup JDK 25
+        uses: b6effb05e454b25005698d916606bdc6ffcbf961 # actions/setup-java v5
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Cache Gradle
+        uses: caa296126883cff596d87d8935842f9db880ef25 # actions/cache v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper/dists
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Check
+        run: ./gradlew ktlintCheck lint test build

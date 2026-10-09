@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 dolvem -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<lint>
+    <!-- D38: la orientación está bloqueada en vertical a propósito. -->
+    <issue id="LockedOrientationActivity" severity="ignore" />
+
+    <!-- Android 16+ ignora las orientaciones fijas, pero el bloqueo de D38 es
+         intencionado, así que se desactiva solo en el manifest. -->
+    <issue id="DiscouragedApi" severity="ignore">
+        <ignore path="src/main/AndroidManifest.xml" />
+    </issue>
+
+    <!-- D56: shrinkResources está desactivado a propósito. -->
+    <issue id="NotShrinkingResources" severity="ignore" />
+
+    <!-- D20: las versiones se fijan en el catálogo y no se persiguen actualizaciones
+         automáticas, así que estos tres avisos no tienen sentido aquí. -->
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="NewerVersionAvailable" severity="ignore" />
+</lint>

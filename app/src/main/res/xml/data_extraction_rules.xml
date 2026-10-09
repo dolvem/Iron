@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 dolvem -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Reglas de extracción de datos. En la iteración 1 no hay almacenamiento propio,
+     así que se respalda todo. -->
+<data-extraction-rules>
+    <cloud-backup />
+    <device-transfer />
+</data-extraction-rules>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 dolvem -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- D51: baseline vacío desde la iteración 1. Un baseline heredado relaja Lint. -->
+<issues format="6" by="lint" type="baseline" dependency="app" version="9.4.0">
+</issues>

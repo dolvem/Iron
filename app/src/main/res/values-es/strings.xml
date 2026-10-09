@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 dolvem -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- D36: español como idioma soportado desde el inicio. -->
+<resources>
+    <string name="app_name">Iron</string>
+
+    <string name="nav_today">Hoy</string>
+    <string name="nav_plans">Planes</string>
+    <string name="nav_exercises">Ejercicios</string>
+    <string name="nav_history">Historial</string>
+    <string name="settings">Ajustes</string>
+
+    <string name="today_empty">No hay nada previsto para hoy.</string>
+    <string name="plans_empty">Todavía no hay planes.</string>
+    <string name="exercises_empty">Todavía no hay ejercicios.</string>
+    <string name="history_empty">Todavía no hay sesiones.</string>
+    <string name="settings_empty">Los ajustes estarán disponibles en una iteración posterior.</string>
+</resources>

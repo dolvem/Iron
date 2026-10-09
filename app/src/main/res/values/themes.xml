@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 dolvem -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Material You resuelve el color en Compose. Aquí solo hace falta un tema base
+     que siga el claro/oscuro del sistema, sin paleta de respaldo. No existe
+     Theme.DeviceDefault.DayNight.NoActionBar, así que la barra se quita por items. -->
+<resources>
+    <style name="Theme.Iron" parent="android:Theme.DeviceDefault.DayNight">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+</resources>

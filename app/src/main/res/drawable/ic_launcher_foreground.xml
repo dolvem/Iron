@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 dolvem -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- D60: glifo de paleta de trazo simple, sin PNG. Placa dentro de la zona segura
+     del adaptive icon (66dp centrados, de 21 a 87 en el viewport de 108). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M30,54a24,24 0 1,1 48,0a24,24 0 1,1 -48,0"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M46,54a8,8 0 1,1 16,0a8,8 0 1,1 -16,0"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4" />
+</vector>
