@@ -182,4 +182,23 @@ class AnalyticsTest {
         val planMetrics = analytics.sessionMetrics(planned, false).first()
         assertTrue(planMetrics.countsForAdherence)
     }
+
+    // D32: el archivado excluye de la lista, pero no de las métricas. Analytics lee por exerciseId sin
+    // mirar archived, así que el detalle de un ejercicio archivado conserva PR, valor actual y volumen.
+    @Test
+    fun archivedExerciseStillProducesMetrics() = runBlocking {
+        val archivedId = db.exerciseDao().insert(Exercise(0, "Peso muerto", "peso muerto", null, true, null)).toInt()
+
+        val workoutId = insertWorkout(null)
+        val timestamp = LocalDate.of(2026, 10, 14).atStartOfDay(zone).toInstant().toEpochMilli()
+        db.setDao().insert(ExerciseSet(0, archivedId, workoutId, timestamp, 10, 120.0, null, false))
+
+        val metrics = analytics.metricsForExercise(archivedId).first()
+        assertEquals(120.0, metrics.bestWeightKg!!, 1e-9)
+        assertEquals(1200.0, metrics.volumeKg, 1e-9)
+
+        val window = analytics.windowBestWeight(archivedId).first()
+        assertFalse(window.fallback)
+        assertEquals(120.0, window.value!!, 1e-9)
+    }
 }
