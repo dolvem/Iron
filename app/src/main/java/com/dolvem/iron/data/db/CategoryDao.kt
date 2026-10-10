@@ -25,9 +25,10 @@ interface CategoryDao {
     suspend fun delete(category: Category)
 
     // D5: las lecturas devuelven Flow directo, sin Outcome. Las categorías se ordenan por nombre
-    // (reglas de orden).
+    // (reglas de orden). Devuelve la lista completa porque la barra de filtros pinta todas, a
+    // diferencia de las lecturas por fila de la iteración 2.
     @Query("SELECT * FROM Category ORDER BY name")
-    fun observeAll(): Flow<Category>
+    fun observeAll(): Flow<List<Category>>
 
     @Query("SELECT * FROM Category WHERE id = :categoryId")
     fun observeById(categoryId: Int): Flow<Category?>
@@ -42,4 +43,9 @@ interface CategoryDao {
     // ejercicios que quedan sin categoría.
     @Query("SELECT COUNT(*) FROM Exercise WHERE categoryId = :categoryId")
     suspend fun countExercises(categoryId: Int): Int
+
+    // D32: en la fusión de categorías los ejercicios se remapean al destino antes del borrado del
+    // origen. Sin el remapeo, el borrado con SET NULL dejaría esos ejercicios sin categoría.
+    @Query("UPDATE Exercise SET categoryId = :destinationId WHERE categoryId = :sourceId")
+    suspend fun remapExercises(sourceId: Int, destinationId: Int): Int
 }

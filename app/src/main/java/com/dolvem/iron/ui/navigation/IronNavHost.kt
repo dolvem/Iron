@@ -18,6 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.dolvem.iron.feature.exercises.ExerciseDetailScreen
 import com.dolvem.iron.feature.exercises.ExercisesScreen
 import com.dolvem.iron.feature.history.HistoryScreen
 import com.dolvem.iron.feature.plans.PlansScreen
@@ -68,7 +69,11 @@ fun IronNavHost() {
                 PlansScreen()
             }
             composable(Destination.EXERCISES.route) {
-                ExercisesScreen()
+                ExercisesScreen(onOpenDetail = { exerciseId -> navController.navigate("exercise/$exerciseId") })
+            }
+            composable(EXERCISE_DETAIL_ROUTE) { entry ->
+                val exerciseId = entry.arguments?.getInt("exerciseId") ?: 0
+                ExerciseDetailScreen(exerciseId)
             }
             composable(Destination.HISTORY.route) {
                 HistoryScreen()

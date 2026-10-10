@@ -62,6 +62,31 @@ object SettingsDefaults {
         Language.ES -> ShortDateFormat.DD_MM_SLASH
         Language.EN -> ShortDateFormat.MM_DD_SLASH
     }
+
+    // El estado inicial de una pantalla usa los defaults resueltos por idioma efectivo (D63), antes de
+    // la primera emisión del DataStore. Los campos con default "sin asignar" siguen siendo null.
+    fun resolved(language: Language): Settings = Settings(
+        themeMode = themeMode,
+        strengthUnit = strengthUnit,
+        longDateFormat = longDateFormat(language),
+        shortDateFormat = shortDateFormat(language),
+        localeOverride = null,
+        maxSets = null,
+        warmupSets = null,
+        showCategories = showCategories,
+        showNotes = showNotes,
+        showGlobalProgress = showGlobalProgress,
+        showUnits = showUnits,
+        inputStyle = inputStyle,
+        curveLines = curveLines,
+        curveSmoothness = curveSmoothness,
+        defaultGraphMetric = defaultGraphMetric,
+        defaultGraphPeriod = defaultGraphPeriod,
+        defaultGraphLimit = defaultGraphLimit,
+        defaultTimeBasedXAxis = defaultTimeBasedXAxis,
+        repEstimation = repEstimation,
+        groupHistory = groupHistory
+    )
 }
 
 // D64: sistema (null) elige el idioma del sistema; si no está soportado, cae en inglés. Se aplica

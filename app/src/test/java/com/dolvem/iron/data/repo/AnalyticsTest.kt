@@ -98,6 +98,20 @@ class AnalyticsTest {
         assertEquals(720.0, window.value!!, 1e-9)
     }
 
+    // D7: el valor actual del detalle es el mejor valor de la ventana actual en la métrica de mejor
+    // peso, con la misma regla de ventana vacía.
+    @Test
+    fun currentValueUsesTheBestWeightOfTheWindow() = runBlocking {
+        val workoutId = insertWorkout(null)
+        insertSet(workoutId, LocalDate.of(2026, 10, 14), 10, 100.0, false)
+        insertSet(workoutId, LocalDate.of(2026, 10, 14), 5, 60.0, true)
+
+        val window = analytics.windowBestWeight(exerciseId).first()
+        assertFalse(window.fallback)
+        // El calentamiento se excluye de la métrica (D9), así que el valor es el de la serie de trabajo.
+        assertEquals(100.0, window.value!!, 1e-9)
+    }
+
     // D7: en la serie temporal un bucket sin datos es hueco (value null); en el conteo por periodo es
     // cero, no hueco.
     @Test

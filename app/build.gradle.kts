@@ -106,6 +106,10 @@ tasks.configureEach {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    // Iteración 3: los ViewModel con viewModelFactory { initializer { } } leyendo el contenedor desde
+    // la Application, y collectAsStateWithLifecycle en las pantallas.
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))

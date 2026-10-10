@@ -42,4 +42,21 @@ interface PlanExerciseDao {
     // contarlas antes del CASCADE del origen.
     @Query("SELECT COUNT(*) FROM PlanExercise WHERE exerciseId = :exerciseId")
     suspend fun countForExercise(exerciseId: Int): Int
+
+    // D32: en unique(planId, exerciseId) gana la fila existente, la misma regla que D11. Las filas en
+    // conflicto no se remapean y se cuentan para el resumen de la fusión.
+    @Query(
+        "SELECT COUNT(*) FROM PlanExercise " +
+            "WHERE exerciseId = :sourceId " +
+            "AND planId IN (SELECT planId FROM PlanExercise WHERE exerciseId = :destinationId)"
+    )
+    suspend fun countMergeConflicts(sourceId: Int, destinationId: Int): Int
+
+    // D32: el remapeo deja fuera las filas en conflicto, porque ahí gana la fila existente.
+    @Query(
+        "UPDATE PlanExercise SET exerciseId = :destinationId " +
+            "WHERE exerciseId = :sourceId " +
+            "AND planId NOT IN (SELECT planId FROM PlanExercise WHERE exerciseId = :destinationId)"
+    )
+    suspend fun remapToDestination(sourceId: Int, destinationId: Int): Int
 }

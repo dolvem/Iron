@@ -33,6 +33,11 @@ interface SetDao {
     @Query("SELECT * FROM ExerciseSet WHERE exerciseId = :exerciseId ORDER BY timestamp DESC")
     fun observeForExercise(exerciseId: Int): Flow<List<ExerciseSet>>
 
+    // Los últimos registros del detalle del ejercicio (views_plan.md). Es la misma lectura anterior
+    // recortada con LIMIT, porque la pantalla solo muestra los últimos.
+    @Query("SELECT * FROM ExerciseSet WHERE exerciseId = :exerciseId ORDER BY timestamp DESC LIMIT :limit")
+    fun observeLastForExercise(exerciseId: Int, limit: Int): Flow<List<ExerciseSet>>
+
     // D2: isWarmup se fija en el insert por posición, que es el número de series ya registradas
     // para esa actividad en esa sesión.
     @Query("SELECT COUNT(*) FROM ExerciseSet WHERE workoutId = :workoutId AND exerciseId = :exerciseId")

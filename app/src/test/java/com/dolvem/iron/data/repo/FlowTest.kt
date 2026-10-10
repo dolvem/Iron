@@ -51,7 +51,7 @@ class FlowTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder<IronDatabase>(context).build()
-        exercises = ExerciseRepo(db.exerciseDao(), db.planExerciseDao())
+        exercises = ExerciseRepo(db, db.exerciseDao(), db.planExerciseDao())
         workouts = WorkoutRepo(db, db.workoutDao(), clock, zone)
         analytics = Analytics(db.setDao(), clock, zone)
     }
@@ -127,6 +127,9 @@ class FlowTest {
 
     // D18: al cancelar la colección el colector se cierra y el Flow deja de emitir. Lo que se inserta
     // después entra en la base de datos, pero no llega a la suscripción cancelada.
+    // La fila existe antes de empezar a coleccionar, así la primera emisión es determinista. Sin eso, el
+    // colector de Turbine arranca antes del insert y la primera consulta encuentra la tabla vacía, que
+    // con un Flow de fila no nula lanza IllegalStateException.
     @Test
     fun cancellingTheCollectorStopsEmissions() = runBlocking {
         val received = mutableListOf<Exercise>()
@@ -137,9 +140,10 @@ class FlowTest {
             .onEach { received.add(it) }
             .onCompletion { collecting = false }
 
+        val first = (exercises.createExercise("Sentadilla", null) as Outcome.Ok<Exercise>).value
+
         tracked.test {
-            db.exerciseDao().insert(Exercise(0, "Sentadilla", "sentadilla"))
-            assertEquals("Sentadilla", awaitItem().name)
+            assertEquals(first, awaitItem())
             assertTrue(collecting)
 
             cancelAndConsumeRemainingEvents()

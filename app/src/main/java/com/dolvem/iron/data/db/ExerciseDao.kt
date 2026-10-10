@@ -41,8 +41,27 @@ interface ExerciseDao {
     @Query("SELECT * FROM Exercise WHERE nameKey = :nameKey")
     fun observeByNameKey(nameKey: String): Flow<Exercise?>
 
+    // D31: la búsqueda es case-insensitive sobre nameKey, la columna normalizada de D4, porque LIKE en
+    // SQLite solo pliega ASCII. El patrón llega ya normalizado desde el repositorio. archived queda
+    // excluido por defecto con la variante que lo muestra (reglas de orden), y el filtro de categoría
+    // admite null, que es "todas las categorías". Devuelve la lista completa porque la pantalla pinta
+    // todos los resultados, a diferencia de las lecturas por fila de la iteración 2.
+    @Query(
+        "SELECT * FROM Exercise " +
+            "WHERE nameKey LIKE :pattern " +
+            "AND (:categoryId IS NULL OR categoryId = :categoryId) " +
+            "AND (:showArchived OR archived = 0) " +
+            "ORDER BY name"
+    )
+    fun search(pattern: String, categoryId: Int?, showArchived: Boolean): Flow<List<Exercise>>
+
     // D5: la preconsulta de conteo es un método separado del borrado, y es lo que permite la
     // confirmación con conteo de afectados. Se cuenta antes del CASCADE.
     @Query("SELECT COUNT(*) FROM ExerciseSet WHERE exerciseId = :exerciseId")
     suspend fun countSets(exerciseId: Int): Int
+
+    // D32: la fusión remapea las series al destino antes del CASCADE del origen, así que el origen se
+    // puede borrar sin perder los registros. Se hace dentro de la transacción del repositorio.
+    @Query("UPDATE ExerciseSet SET exerciseId = :destinationId WHERE exerciseId = :sourceId")
+    suspend fun remapSets(sourceId: Int, destinationId: Int): Int
 }

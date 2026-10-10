@@ -69,6 +69,18 @@ class Analytics(private val dao: SetDao, private val clock: Clock, private val z
         )
     }
 
+    // D7: el valor actual del detalle es el mejor valor de la ventana actual, aquí en la métrica de
+    // mejor peso. La ventana vacía usa la última semana con datos y queda etiquetada, la misma regla
+    // que windowVolume.
+    fun windowBestWeight(exerciseId: Int): Flow<WindowValue> = dao.observeForExercise(exerciseId).map { sets ->
+        val week = windowWithData(sets)
+        WindowValue(
+            week = week,
+            value = bestWeightKg(setsInWeek(sets, week, zone))?.let { round2(it) },
+            fallback = week != currentIsoWeek(clock, zone)
+        )
+    }
+
     // D7: serie temporal por semanas ISO, de la más antigua a la más reciente. Un bucket sin datos
     // es un hueco (value null).
     fun weeklyVolumeSeries(exerciseId: Int, weeks: Int): Flow<List<WindowValue>> =

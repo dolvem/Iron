@@ -16,6 +16,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
 // D40: resultado del borrado de una serie, para el undo de la iteración 5. Devuelve la serie borrada y la
@@ -104,6 +105,11 @@ class SetRepo(
             }
         Outcome.Ok(DeletedSet(set, deletedWorkout))
     }
+
+    // D5: las lecturas devuelven Flow directo, sin Outcome. Los últimos registros del detalle del
+    // ejercicio (views_plan.md), recortados con LIMIT porque la pantalla solo muestra los últimos.
+    fun observeLastSets(exerciseId: Int, limit: Int): Flow<List<ExerciseSet>> =
+        setDao.observeLastForExercise(exerciseId, limit)
 
     // D42: los campos editables de una serie son las métricas, las notas, isWarmup y el timestamp; el
     // ejercicio no, porque la serie pertenece a la actividad elegida al registrarla. Editar series de una

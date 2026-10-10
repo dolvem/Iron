@@ -8,6 +8,7 @@ import androidx.room3.Room
 import com.dolvem.iron.data.db.IronDatabase
 import com.dolvem.iron.data.db.IronMigrations
 import com.dolvem.iron.data.repo.Analytics
+import com.dolvem.iron.data.repo.CategoryRepo
 import com.dolvem.iron.data.repo.ExerciseRepo
 import com.dolvem.iron.data.repo.PlanRepo
 import com.dolvem.iron.data.repo.SetRepo
@@ -25,7 +26,7 @@ import java.time.ZoneId
 // dos, por eso es testeable. Lo mismo ocurre con SettingsDataStore (D65): en producción lo construye
 // create, y en los tests se inyecta un DataStore sobre un fichero temporal.
 // Iteración 3: los ViewModel se construyen con viewModelFactory { initializer { } } leyendo este contenedor
-// desde la Application (IronApp). Aquí no hay ViewModel todavía.
+// desde la Application (IronApp), como fija el plan de ingeniería.
 class AppContainer(
     val db: IronDatabase,
     val settings: SettingsDataStore,
@@ -33,10 +34,12 @@ class AppContainer(
     val zone: ZoneId = ZoneId.systemDefault()
 ) {
 
-    // D5: los repositorios reciben los DAOs de la base de datos. SetRepo y WorkoutRepo reciben también la
-    // base de datos porque D1 y D8 exigen que el cierre de la víspera, la apertura del día y el insert
-    // estén en la misma transacción.
-    val exerciseRepo: ExerciseRepo = ExerciseRepo(db.exerciseDao(), db.planExerciseDao())
+    // D5: los repositorios reciben los DAOs de la base de datos. SetRepo, WorkoutRepo, ExerciseRepo y
+    // CategoryRepo reciben también la base de datos porque D1, D8 y D32 exigen que el remapeo de las
+    // FKs, el cierre de la víspera, la apertura del día y el insert estén en la misma transacción.
+    val exerciseRepo: ExerciseRepo = ExerciseRepo(db, db.exerciseDao(), db.planExerciseDao())
+
+    val categoryRepo: CategoryRepo = CategoryRepo(db, db.categoryDao())
 
     val planRepo: PlanRepo = PlanRepo(
         db.planDao(),

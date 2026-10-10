@@ -16,4 +16,102 @@
     <string name="exercises_empty">Todavía no hay ejercicios.</string>
     <string name="history_empty">Todavía no hay sesiones.</string>
     <string name="settings_empty">Los ajustes estarán disponibles en una iteración posterior.</string>
+
+    <!-- Iteración 3: barra de filtros de Ejercicios (D31). -->
+    <string name="exercises_search_label">Buscar</string>
+    <string name="exercises_filter_category">Categoría</string>
+    <string name="exercises_filter_all_categories">Todas las categorías</string>
+    <string name="exercises_filter_show_archived">Mostrar archivados</string>
+    <string name="exercises_no_results">No hay resultados con este filtro.</string>
+    <string name="exercises_archived">Archivado</string>
+    <string name="exercises_row_actions">Acciones de %s</string>
+    <string name="exercises_create_action">Crear ejercicio</string>
+
+    <!-- Iteración 3: CRUD de ejercicios. -->
+    <string name="exercise_create_title">Nuevo ejercicio</string>
+    <string name="exercise_rename_title">Renombrar ejercicio</string>
+    <string name="exercise_delete_title">Borrar ejercicio</string>
+    <string name="exercise_merge_title">Fusionar ejercicio en</string>
+    <string name="exercise_name_label">Nombre</string>
+    <string name="exercise_merge_hint">Elige el destino. Su nombre sobrevive.</string>
+
+    <!-- Iteración 3: CRUD de categorías. -->
+    <string name="categories_title">Categorías</string>
+    <string name="categories_empty">Todavía no hay categorías.</string>
+    <string name="category_create_title">Nueva categoría</string>
+    <string name="category_rename_title">Renombrar categoría</string>
+    <string name="category_delete_title">Borrar categoría</string>
+    <string name="category_merge_title">Fusionar categoría en</string>
+
+    <!-- Iteración 3: EjercicioDetalle. -->
+    <string name="exercise_category_none">Sin categoría</string>
+    <string name="exercise_notes">Notas</string>
+    <string name="exercise_stats">Estadísticas</string>
+    <string name="exercise_pr">PR</string>
+    <string name="exercise_current_value">Valor actual</string>
+    <string name="exercise_weekly_volume">Volumen semanal</string>
+    <string name="exercise_last_records">Últimos registros</string>
+    <string name="exercise_no_records">Todavía no hay registros.</string>
+    <!-- D7: la ventana vacía se etiqueta, porque un hueco se lee como "no he entrenado". -->
+    <string name="exercise_window_fallback">última semana con datos</string>
+    <string name="value_placeholder">—</string>
+    <string name="record_warmup">calentamiento</string>
+
+    <!-- Iteración 3: quick log, el FAB contextual. -->
+    <string name="quick_log_title">Registro rápido</string>
+    <string name="quick_log_load">Peso</string>
+    <string name="quick_log_reps">Repeticiones</string>
+
+    <!-- Acciones compartidas por las confirmaciones de D40. -->
+    <string name="action_save">Guardar</string>
+    <string name="action_create">Crear</string>
+    <string name="action_rename">Renombrar</string>
+    <string name="action_delete">Borrar</string>
+    <string name="action_merge">Fusionar</string>
+    <string name="action_archive">Archivar</string>
+    <string name="action_unarchive">Desarchivar</string>
+    <string name="action_confirm">Confirmar</string>
+    <string name="action_cancel">Cancelar</string>
+
+    <!-- D5: las cadenas de las variantes de Outcome. -->
+    <string name="error_duplicate_name">%s ya existe.</string>
+    <string name="error_session_closed">La sesión %d está cerrada.</string>
+    <string name="error_plan_has_open_session">Hay una sesión abierta para el plan %d.</string>
+    <string name="error_set_without_metric">Una serie necesita repeticiones o peso.</string>
+    <string name="error_invalid_reps">Las repeticiones deben ser al menos 1.</string>
+    <string name="error_invalid_load">El peso debe ser mayor que 0.</string>
+
+    <!-- D36: los conteos de las confirmaciones usan plurals, con reglas distintas en cada idioma.
+    Español añade la cantidad many, que inglés no tiene. -->
+    <plurals name="confirm_delete_exercise">
+        <item quantity="one">%d serie se borrará.</item>
+        <item quantity="other">%d series se borrarán.</item>
+        <item quantity="many">%d series se borrarán.</item>
+    </plurals>
+    <plurals name="confirm_delete_category">
+        <item quantity="one">%d ejercicio quedará sin categoría.</item>
+        <item quantity="other">%d ejercicios quedarán sin categoría.</item>
+        <item quantity="many">%d ejercicios quedarán sin categoría.</item>
+    </plurals>
+    <plurals name="confirm_merge_exercise">
+        <item quantity="one">%d serie se remapeará al destino.</item>
+        <item quantity="other">%d series se remapearán al destino.</item>
+        <item quantity="many">%d series se remapearán al destino.</item>
+    </plurals>
+    <plurals name="confirm_merge_category">
+        <item quantity="one">%d ejercicio se remapeará al destino.</item>
+        <item quantity="other">%d ejercicios se remapearán al destino.</item>
+        <item quantity="many">%d ejercicios se remapearán al destino.</item>
+    </plurals>
+    <plurals name="confirm_merge_plan_rows">
+        <item quantity="one">%d fila del plan se remapeará.</item>
+        <item quantity="other">%d filas del plan se remapearán.</item>
+        <item quantity="many">%d filas del plan se remapearán.</item>
+    </plurals>
+    <!-- D32: los conflictos de unique(planId, exerciseId) se registran en el resumen de la fusión. -->
+    <plurals name="merge_conflicts">
+        <item quantity="one">%d conflicto registrado.</item>
+        <item quantity="other">%d conflictos registrados.</item>
+        <item quantity="many">%d conflictos registrados.</item>
+    </plurals>
 </resources>

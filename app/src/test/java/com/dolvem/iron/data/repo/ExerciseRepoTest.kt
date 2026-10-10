@@ -34,7 +34,7 @@ class ExerciseRepoTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder<IronDatabase>(context).build()
-        repo = ExerciseRepo(db.exerciseDao(), db.planExerciseDao())
+        repo = ExerciseRepo(db, db.exerciseDao(), db.planExerciseDao())
     }
 
     @After
