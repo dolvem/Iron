@@ -13,20 +13,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
-import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,22 +36,17 @@ import com.dolvem.iron.ui.components.QuickLogFab
 import com.dolvem.iron.ui.components.ScreenPlaceholder
 import com.dolvem.iron.ui.components.formatDate
 import com.dolvem.iron.ui.components.formatLoad
-import com.dolvem.iron.ui.components.outcomeMessage
-import kotlinx.coroutines.launch
 
 // El detalle es longitudinal: un ejercicio a través del tiempo (views_plan.md). Aquí están la identidad,
 // las estadísticas y los últimos registros. La gráfica la escriben los componentes compartidos de
 // feature/graph/ en la iteración 8, con la alternativa textual accesible de D35.
 @Composable
 fun ExerciseDetailScreen(exerciseId: Int) {
-    val resources = LocalResources.current
     val app = LocalContext.current.applicationContext as IronApp
     val viewModel: ExerciseDetailViewModel =
         viewModel(factory = ExerciseDetailViewModel.factory(app.container, exerciseId))
     val quickLog: QuickLogViewModel = viewModel(factory = QuickLogViewModel.factory(app.container))
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
     var quickLogOpen by rememberSaveable { mutableStateOf(false) }
 
     val exercise = state.exercise
@@ -66,7 +56,6 @@ fun ExerciseDetailScreen(exerciseId: Int) {
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             // Quick log FAB contextual: preselecciona este ejercicio (views_plan.md).
             QuickLogFab { quickLogOpen = true }
@@ -79,13 +68,12 @@ fun ExerciseDetailScreen(exerciseId: Int) {
         }
     }
 
+    // El error de D6 se muestra dentro del sheet, no en un snackbar de la pantalla: el sheet tapa el
+    // SnackbarHost y el editor se queda abierto tras el rechazo (D30).
     if (quickLogOpen) {
         QuickLogSheet(
             exercise = exercise,
             viewModel = quickLog,
-            onMessage = { error ->
-                scope.launch { snackbarHostState.showSnackbar(outcomeMessage(resources, error)) }
-            },
             onDismiss = { quickLogOpen = false }
         )
     }

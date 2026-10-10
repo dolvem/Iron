@@ -20,12 +20,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.dolvem.iron.R
 import com.dolvem.iron.data.db.Exercise
 import com.dolvem.iron.domain.model.Outcome
+import com.dolvem.iron.ui.components.outcomeMessage
 import com.dolvem.iron.ui.components.parseDecimal
 import kotlinx.coroutines.launch
 
@@ -36,15 +41,16 @@ import kotlinx.coroutines.launch
 // camino de quick log, sin variantes por pantalla.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuickLogSheet(
-    exercise: Exercise,
-    viewModel: QuickLogViewModel,
-    onMessage: (Outcome.Error) -> Unit,
-    onDismiss: () -> Unit
-) {
+fun QuickLogSheet(exercise: Exercise, viewModel: QuickLogViewModel, onDismiss: () -> Unit) {
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     var load by rememberSaveable { mutableStateOf("") }
     var reps by rememberSaveable { mutableStateOf("") }
+
+    // D6: el editor muestra el error que devuelve el repositorio, no valida por su cuenta. El error se
+    // muestra dentro del sheet, porque el SnackbarHost de la pantalla queda tapado mientras el sheet
+    // está abierto, y el editor se mantiene abierto tras el rechazo (D30).
+    var errorMessage by rememberSaveable { mutableStateOf<String?>(null) }
 
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -77,11 +83,24 @@ fun QuickLogSheet(
                         is Outcome.Ok -> {
                             load = ""
                             reps = ""
+                            errorMessage = null
                         }
-                        is Outcome.Error -> onMessage(outcome)
+                        is Outcome.Error -> errorMessage = outcomeMessage(resources, outcome)
                     }
                 }
             }) { Text(stringResource(R.string.action_save)) }
+
+            val message = errorMessage
+            if (message != null) {
+                Text(
+                    message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    // D35: el mensaje se anuncia al aparecer, no solo cuando se lee. Role no tiene
+                    // variante Error en Compose 1.12, así que se usa liveRegion.
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+                )
+            }
         }
     }
 }
