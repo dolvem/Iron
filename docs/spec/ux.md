@@ -3,16 +3,16 @@
 
 # UX operativa
 
-Parte de `docs/README.md`. El estado de las decisiones D28–D46 está en `docs/decisions_plan.md`. Las cerradas en la primera revisión del 08/10/2026 son D31, D38 y D41 a D45; en la quinta revisión se cierran D37 y D46; en la sexta revisión se cierran las demás: D28 a D30, D32 a D35, D39 y D40. No queda ninguna pendiente en este documento.
+Parte de `docs/README.md`. El estado de las decisiones está en `docs/state/decisions.md`: D28 a D46, y D70 y D71, que salen de la implementación de la iteración 3. La estructura de las pantallas está en `docs/spec/views.md`.
 
 ## Entrada de datos
 
 - **Entrada numérica:** peso con teclado decimal, mostrado con 2 decimales, autofocus en el campo de peso. `reps` es entero con stepper entre 1 y 100, con estado vacío: `reps` puede quedar nulo y el rango solo aplica cuando hay valor, así que se puede registrar una serie con solo peso (D30, cerrada). Botones rápidos de placas, como accesos rápidos de suma y no como inventario de placas físicas: kg 1,25 / 2,5 / 5 / 10 / 20 / 25; lb 2,5 / 5 / 10 / 25 / 35 / 45 (D29, cerrada). Es el gesto más repetido de la app, así que se trata como una decisión de diseño, no como un detalle de formulario.
 - **Separador decimal:** se aceptan coma y punto y se normaliza a punto, porque en español el teclado produce coma. La regla solo aplica en modo teclado, porque con `inputStyle = stepper` no se escribe un separador. El campo acepta lo que el usuario escribe y el redondeo a 2 decimales, medio arriba, ocurre al guardar, el mismo criterio de D10. El separador mostrado depende del idioma activo: la normalización es parsing de entrada, no presentación (D28, cerrada).
-- **Validación en el editor:** el editor de serie muestra el error que devuelve el repositorio, no valida por su cuenta. `reps = 0` y `loadKg = 0` se rechazan antes de insertar.
+- **Validación en el editor:** el editor de serie muestra el error que devuelve el repositorio, no valida por su cuenta. `reps = 0` y `loadKg = 0` se rechazan antes de insertar. El error se muestra dentro del sheet, no en el `SnackbarHost` de la pantalla, porque el sheet lo tapa y el editor se queda abierto tras el rechazo (D70).
 - **Editor de serie:** se mantiene abierto tras registrar y el foco pasa al siguiente campo. Es el mismo componente en sesión, quick log e historial.
 - **Campos editables de una serie:** métricas, notas, `isWarmup` y `timestamp`. El ejercicio no se edita, porque cambiarlo rompería la identidad longitudinal del ejercicio.
-- **Quick log:** exige `reps` o `loadKg`. Escribe en la sesión abierta; si no hay ninguna, crea una sesión libre para hoy. El editor de serie y el FAB son componentes compartidos en `ui/components/`, no variantes por pantalla.
+- **Quick log:** exige `reps` o `loadKg`, porque un registro con ambos vacíos es ruido. Escribe en la sesión abierta; si no hay ninguna, crea una sesión libre para hoy. Siempre genera series de trabajo, porque no hay contexto de plan (D2), y no permite cambiar de plan. El editor de serie y el FAB son componentes compartidos en `ui/components/`, no variantes por pantalla. El contexto de preselección por pantalla está en `docs/spec/views.md`.
 
 ## Listados y filtros
 
@@ -33,7 +33,7 @@ Parte de `docs/README.md`. El estado de las decisiones D28–D46 está en `docs/
 - **Muerte del proceso:** Android mata la app en segundo plano. Los filtros y la selección de gráfica se guardan en `SavedStateHandle`; el estado local de pantalla usa `rememberSaveable`.
 - **Back predictivo:** se acepta el comportamiento por defecto con target API 36.
 - **Dynamic color:** con `minSdk` 31 está disponible en todos los dispositivos donde corre la app. No hay paleta de respaldo que escribir ni mantener.
-- **Accesibilidad:** targets táctiles de 48dp, `contentDescription` en iconos, respeto a la escala de fuente, contraste verificado con colores dinámicos, y alternativa textual con la etiqueta del bucket y el valor de la métrica seleccionada en las gráficas, presentada como una sección plegable siempre disponible, porque Vico no es accesible por defecto y porque comprobar el estado de los servicios de accesibilidad para cambiar el layout es frágil. Se verifica en emulador, porque D19 deja la UI fuera de los tests (D35, cerrada).
+- **Accesibilidad:** targets táctiles de 48dp, `contentDescription` en iconos, respeto a la escala de fuente, contraste verificado con colores dinámicos, y alternativa textual con la etiqueta del bucket y el valor de la métrica seleccionada en las gráficas, presentada como una sección plegable siempre disponible, porque Vico no es accesible por defecto y porque comprobar el estado de los servicios de accesibilidad para cambiar el layout es frágil. Los controles de selector dentro de una fila clicable reciben nombre accesible con `semantics(mergeDescendants = true)`, porque por sí solos no lo tienen: el nombre llega del `Text` hermano, que TalkBack lee, pero el control no lo tiene (D71). Se verifica en emulador, porque D19 deja la UI fuera de los tests (D35, cerrada).
 - **Listas largas:** `LazyColumn` con `key` en todos los listados.
 - **Alcance de pantalla:** solo móvil en vertical, bloqueado en el manifest con `android:screenOrientation="portrait"` en `MainActivity` (D38, cerrada). La regla `LockedOrientationActivity` se desactiva en `lint.xml`. Horizontal, tablet y plegables quedan fuera de v1.
 - **Permisos:** ninguno. La app es offline-first y el acceso a ficheros se hace por SAF.

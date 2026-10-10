@@ -3,7 +3,7 @@
 
 # Plan de datos: esquema Room, ajustes y formato
 
-Parte de `docs/README.md`. Las reglas de comportamiento están en `docs/rules_plan.md` y el estado de las decisiones (D1–D62) en `docs/decisions_plan.md`.
+Parte de `docs/README.md`. Las reglas de comportamiento están en `docs/spec/rules.md` y el estado de las decisiones (D1–D72) en `docs/state/decisions.md`.
 
 Cambiar este documento obliga a una migración.
 
@@ -141,4 +141,11 @@ Métricas de gráfica viables: mejor peso, volumen (peso × reps), repeticiones 
 - **Convenciones** (D16, cerrada en la sexta revisión): camelCase, nulls escritos como `null` y no omitidos, `exportedAt` en ISO 8601 con zona, timestamps de serie en epoch millis UTC. La serialización usa DTOs separados de las entidades, y los DTOs excluyen `nameKey`, que es derivada. Escribir nulls en lugar de omitirlos hace que un lector no tenga que distinguir entre campo ausente y campo nulo.
 - **CSV de gráficas:** columnas `timestamp,exercise,metric,value` (métrica según selección), UTF-8 con BOM. Exporta la ventana actual de la pantalla, y una ventana vacía exporta cabeceras sin filas (D15, cerrada en la sexta revisión). Respeta la exclusión del calentamiento de D9.
 
-El procedimiento de importación (fusión, colisiones, backup previo) está en `docs/rules_plan.md`.
+El procedimiento de importación (fusión, colisiones, backup previo) está en `docs/spec/rules.md`.
+
+## Localización
+
+- Base `values/` en inglés y `values-es` en español (D36). Añadir un idioma es añadir una carpeta `values-XX`.
+- Todas las cadenas en `strings.xml` desde el día 1.
+- Los conteos de las confirmaciones usan `plurals.xml`, con reglas distintas en cada idioma. En español la cantidad `many` es obligatoria (Lint `MissingQuantity`).
+- `localeOverride` se aplica de forma explícita en Compose y no depende de la resolución de recursos (D64).

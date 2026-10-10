@@ -3,9 +3,9 @@
 
 # Reglas de negocio y definiciones de cálculo
 
-Parte de `docs/README.md`. El esquema está en `docs/data_plan.md` y el estado de cada decisión (D1–D62) en `docs/decisions_plan.md`.
+Parte de `docs/README.md`. El esquema está en `docs/spec/data.md` y el estado de cada decisión (D1–D72) en `docs/state/decisions.md`.
 
-Estas reglas son las que convierten el esquema en comportamiento. Se cierran antes de escribir los DAOs, porque cambiarlas después obliga a migraciones. Las tres que estaban abiertas (frontera de sesión, calentamiento y día de sesión) están cerradas en la revisión del 08/10/2026 y ya aparecen reflejadas aquí. En la quinta revisión se cierran D6, D7, D8 y D10. En la sexta revisión se cierran D11 a D15 y D39, las pendientes que quedaban en este documento.
+Estas reglas son las que convierten el esquema en comportamiento. Se cerraron antes de escribir los DAOs, porque cambiarlas después obliga a migraciones.
 
 ## Tiempo y frontera de día
 
@@ -41,6 +41,11 @@ Estas reglas son las que convierten el esquema en comportamiento. Se cierran ant
 - Una sesión que nunca tuvo series no existe, porque la apertura es perezosa, y por tanto no se puede cerrar. Una sesión abierta se elimina al borrar su última serie, porque conservarla abierta bloquearía la restricción de una sesión activa por plan al día siguiente. Una sesión cerrada a la que se le borran todas las series se conserva y aparece en el historial con un estado vacío (D39, cerrada).
 - El undo recrea la sesión cuando el borrado de la última serie la eliminó, con el `id` y el `startedAt` originales. Cuando la serie provocó un cierre automático y además era la última, el undo primero recrea la sesión y después revierte el cierre (D40, cerrada).
 - `workoutId` es obligatorio. Editar el `timestamp` de una serie no la reasigna a otra sesión.
+- Una sesión de plan puede contener series de ejercicios que no están en el plan, y eso es correcto: la sesión es lo que pasó, no lo que estaba previsto.
+
+## RPE
+
+RPE (Rate of Perceived Exertion) es la escala 1–10 que indica qué tan cerca está una serie del fallo: RPE 10 = fallo, RPE 9 ≈ 1 rep al fallo, RPE 6 ≈ 4 reps al fallo. En Iron es un **objetivo orientativo** definido en `PlanExercise.targetRpe` al configurar el plan; se muestra como referencia durante la sesión y no se registra ni se marca por serie.
 
 ## Borrados
 
@@ -56,6 +61,7 @@ Estas reglas son las que convierten el esquema en comportamiento. Se cierran ant
 
 - `x/maxSets` cuenta **solo series de trabajo**. El calentamiento se muestra aparte como `y/warmupSets` cuando esté definido.
 - **Calentamiento en métricas:** PR, volumen, repeticiones totales y conteo de series excluyen las series con `isWarmup`.
+- **`isWarmup` por posición:** se fija en el insert según el número de series ya registradas para esa actividad en esa sesión, y no se recalcula al borrar o editar. Si se borra una serie de calentamiento, las restantes mantienen el flag (D2).
 - **Volumen:** `loadKg × reps`. Las series con `reps` nulo se excluyen del volumen.
 - **PR:** máximo `loadKg` por ejercicio. Es la métrica "mejor peso", no el mejor volumen.
 - **Valor actual:** mejor valor de la ventana actual, que es la semana ISO en curso. Si la ventana está vacía, se muestra el valor de la última semana con datos y se etiqueta la ventana (D7, cerrada).
@@ -86,7 +92,7 @@ Estas reglas son las que convierten el esquema en comportamiento. Se cierran ant
 
 ## Orden y paginación
 
-- Ejercicios: por nombre. Historial: fecha descendente. Planes: por `sequence`.
+- **Ejercicios:** por `nameKey` (D68), no por `name`, porque la colación BINARY de SQLite no es case-insensitive con acentos y el orden no coincidiría con la unicidad de D4. Historial: fecha descendente. Planes: por `sequence`.
 - Historial agrupado por sesión, cargado de 30 sesiones por página. El agrupamiento usa `Workout.sessionDate`.
 - Filtros del historial: ejercicio, plan, categoría, rango de fechas y sesiones libres.
 - `archived` y `enabled = false` quedan excluidos por defecto, con filtro para mostrarlos.

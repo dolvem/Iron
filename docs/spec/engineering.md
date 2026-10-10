@@ -3,7 +3,7 @@
 
 # Decisiones de ingeniería
 
-Parte de `docs/README.md`. El estado de las decisiones (D1–D62) está en `docs/decisions_plan.md`.
+Parte de `docs/README.md`. El estado de las decisiones (D1–D72) está en `docs/state/decisions.md`.
 
 ## Decisiones de ingeniería (cerradas)
 
@@ -14,7 +14,7 @@ Parte de `docs/README.md`. El estado de las decisiones (D1–D62) está en `docs
 - **Fechas:** `java.time` es nativo desde API 26, así que con `minSdk` 31 no hace falta core library desugaring. Todo el cálculo de días, semanas ISO y agrupación de gráficas usa `java.time`, no `java.util.Date`.
 - **Sin bifurcaciones por versión:** con `minSdk` 31 no hay `Build.VERSION.SDK_INT`, ni `@RequiresApi`, ni warnings de Lint por usar APIs por encima del mínimo. El código no se llena de comprobaciones de versión.
 - **Testing:** JUnit4. Robolectric para código que toca APIs de Android, Room en memoria para DAOs, Turbine para Flow.
-- **Room:** `exportSchema = true` y los JSON de esquema versionados en el repo, para poder testear migraciones. Nunca `fallbackToDestructiveMigration` en builds de release.
+- **Room:** `exportSchema = true` y los JSON de esquema versionados en el repo, para poder testear migraciones. Nunca `fallbackToDestructiveMigration` en builds de release. Room no soporta índices parciales, así que la restricción de una sesión activa por plan se implementa con el índice compuesto `(planId, endedAt)` más la validación transaccional del repositorio; el cierre automático libera la restricción.
 - **Calidad** (D27, D50, D51, cerradas): ktlint-gradle con `ktlint_code_style = android_studio` (el valor `android` de D50 no existe en ktlint 1.x), `.editorconfig` con `max_line_length = 120`, sin wildcard imports, UTF-8, newline final, indentación de 4 espacios, y `ktlint_function_naming_ignore_when_annotated_with = Composable` para permitir los composables en PascalCase. El plugin se aplica también en el módulo `app`, porque aplicado solo en la raíz no cubre los fuentes de los módulos. Android Lint con `abortOnError = true`, warnings como error, `checkReleaseBuilds = true`, `lint-baseline.xml` vacío desde la iteración 1, `lint.xml` para desactivar `LockedOrientationActivity` y `MissingTranslation` activo, más `DiscouragedApi` en el manifest (Android 16 ignora las orientaciones fijas), `NotShrinkingResources` (D56) y los tres avisos de versiones (`AndroidGradlePluginVersion`, `GradleDependency`, `NewerVersionAvailable`), que no tienen sentido con un catálogo fijado por D20.
 - **Distribución:** APK propio y F-Droid. Play Store queda fuera de v1. F-Droid exige build reproducible y dependencias libres de licencia privativa. Si algún día se publica en Play, el target mínimo exigido desde el 31/08/2026 es API 36, por eso el `targetSdk` se fija en 36 y no en 35. Con compileSdk 37, dejarlo en 36 activa `OldTargetApi` en Lint, así que `targetSdk` sube a 37.
 - **Build reproducible** (D24, D56, cerradas): seis reglas. En AGP 9.4 el DSL ya no expone tres de ellas, así que el mapeo es este: `vcsInfo.include = false` en el build type de release (ya no vive en el bloque `android`); cruncher desactivado por propiedad `android.enableResourceOptimizations=false` (deprecated, pero funcional); densidades de vector drawables cumplidas de hecho, porque no hay PNG propio en el repo y `vectorDrawables` solo se expone en product flavors; APK determinista por propiedad `android.experimental.forceDeterministicApk=true`; tarea `ArtProfile` desactivada por nombre (`tasks.configureEach`), porque AGP 9.4 no la expone en el DSL y sí la crea; `shrinkResources = false` y `debuggable = false` en el build type. Minify con R8 sí. Firma v2 + v3, con el APK unsigned y la firma externa (D66). Con una app 100 % Kotlin y sin NDK el riesgo de no reproducibilidad es bajo, pero las seis reglas se escriben igual. Comprobado el 09/10/2026: dos builds de release consecutivos dan el mismo SHA-256.
@@ -35,6 +35,14 @@ Los repositorios devuelven un `Outcome` sellado con los errores de negocio esper
 
 Las excepciones se reservan para fallos de I/O y de base de datos, con una excepción: la violación de único se captura en el repositorio y se mapea al error de negocio, porque la comprobación previa no cubre la carrera entre la comprobación y el insert.
 
+## Firmas de lectura de los DAOs (D67, cerrada)
+
+Las consultas que pueden devolver varias filas usan `Flow<List<T>>`. `Flow<T>` queda solo para las consultas de una fila (`observeById`, `observeOpenForPlan`, `observeLastSessionForPlan`, `observeSessionCountFrom`), que son las que tienen sentido como fila única. Con `Flow<T>` sobre una consulta de varias filas, Room emite una fila por invalidación, así que el resto del resultado no llega a la pantalla.
+
+## Recursos y locale en Compose (D72, cerrada)
+
+En Compose se usa `LocalResources.current` en lugar de `LocalContext.current.getString`, y `LocalLocale.current.platformLocale` en lugar de `Locale.getDefault()`. No es solo un aviso de Lint: `Locale.getDefault()` no respeta `localeOverride` de D64, que se aplica de forma explícita en Compose. Las funciones que necesitan cadenas reciben `Resources` como parámetro.
+
 ## Estructura del proyecto (paquetes)
 
 ```
@@ -44,6 +52,7 @@ com.dolvem.iron
 ├── data/settings/        # SettingsDataStore (tipo Settings con defaults)
 ├── data/repo/            # ExerciseRepo, PlanRepo, WorkoutRepo, SetRepo, Analytics
 ├── domain/model/         # modelos de dominio + conversiones de unidades (kg↔lb)
+├── ui/navigation/        # Destination y IronNavHost: los cuatro destinos y las rutas de detalle
 ├── ui/components/        # editor de serie y FAB de quick log, compartidos entre pantallas
 ├── feature/today/        # Hoy: plan del día, sesión abierta, progreso global
 ├── feature/plans/        # CRUD planes + plan_exercises (orden, series máx, calentamiento, RPE)
@@ -104,15 +113,4 @@ Cabecera SPDX en cada fichero fuente, con la carpeta `LICENSES/` conteniendo el 
 // SPDX-License-Identifier: GPL-3.0-or-later
 ```
 
-## Preparación del entorno (bloqueante para la iteración 1)
-
-Comprobado el 08/10/2026 en esta máquina:
-
-- asdf tiene el plugin de Java con `temurin-25.0.2+10.0.LTS` **instalada** (D52). Lo que faltaba era fijarla en `.tool-versions`, que es lo que hace que `java -version` resuelva dentro del proyecto.
-- asdf tiene Gradle 9.4.1, pero el build usa el wrapper con 9.8.1 (D20), que es lo que ejecuta CI (D49). asdf no fija Gradle en este proyecto.
-- La SDK se contiene en el SSD: `/media/dolvem/SSD/apps/Android/Sdk`, con `cmdline-tools/latest`. Están instalados `platforms;android-37.1` (el 36 se sustituyó por el 37.1 el 09/10/2026, porque las versiones fijadas en D20 exigen compileSdk 37), `build-tools;36.0.0`, `build-tools;34.0.0` (la que firma, D55), `platform-tools`, `emulator` y la imagen de sistema Google APIs para API 31. Las licencias se copiaron de `/usr/lib/android-sdk`, que ya tenía el SHA1 aceptado, así que la instalación es no interactiva.
-- El AVD de referencia es `iron_api31`, con perfil Pixel 6, y sus datos están en `/media/dolvem/SSD/apps/Android/avd` mediante `ANDROID_AVD_HOME`.
-- **La imagen arm64 de D61 no se puede ejecutar en esta máquina.** El emulador en host x86_64 rechaza las imágenes arm64: `Avd's CPU Architecture 'arm64' is not supported by the QEMU2 emulator on x86_64 host`. El AVD usa `system-images;android-31;google_apis;x86_64`. arm64 sigue siendo la ABI del teléfono con Android 15, que es el dispositivo de referencia, así que D61 hay que matizarlo: arm64 para el dispositivo físico, x86_64 para el emulador.
-- `local.properties` con `sdk.dir` apuntando a la SDK del SSD, y `ANDROID_HOME` y `ANDROID_AVD_HOME` exportados en `~/.bashrc`.
-- **Bloqueante resuelto el 08/10/2026:** SVM activado en la firmware, `kvm_amd` carga, `/dev/kvm` existe y el usuario está en el grupo `kvm`. El AVD arranca con aceleración hardware y `sys.boot_completed` es 1. La fase 0 está cerrada.
-- Repositorio git iniciado el 09/10/2026 (D22). `git init` forma parte de la iteración 1.
+El estado del entorno de desarrollo, con lo comprobado en la máquina, está en `docs/iterations/00-entorno.md`. Aquí solo las decisiones de stack y herramientas.
