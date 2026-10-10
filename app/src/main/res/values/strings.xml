@@ -49,6 +49,40 @@
     <string name="category_delete_title">Delete category</string>
     <string name="category_merge_title">Merge category into</string>
 
+    <!-- Iteración 4: Planes y PlanDetalle. El detalle es solo configuración, y la frecuencia es la de
+    D8: última sesión y sesiones en los últimos 30 días. -->
+    <string name="plans_create_action">Create plan</string>
+    <!-- Plan.title nulo se muestra como "Plan" (rules.md). -->
+    <string name="plan_title_default">Plan</string>
+    <string name="plan_title_label">Title</string>
+    <string name="plan_days_label">Days</string>
+    <!-- Cadena vacía significa "nunca" (D62). -->
+    <string name="plan_days_none">No days</string>
+    <string name="plan_sequence_label">Order</string>
+    <string name="plan_today_label">Today</string>
+    <string name="plan_create_title">New plan</string>
+    <string name="plan_edit_title">Edit plan</string>
+    <string name="plan_delete_title">Delete plan</string>
+    <string name="plan_frequency_title">Frequency</string>
+    <string name="plan_last_session">Last session</string>
+    <string name="plan_sessions_last_30_days">Sessions in the last 30 days</string>
+    <!-- Reglas de borrados: el plan con sesión abierta bloquea edición y borrado. -->
+    <string name="plan_blocked_notice">There is an open session for this plan. The template is blocked until the session is closed.</string>
+    <string name="plan_exercises_title">Plan exercises</string>
+    <string name="plan_exercises_empty">No exercises in this plan.</string>
+    <!-- archived y enabled = false quedan excluidos por defecto, con filtro para mostrarlos. -->
+    <string name="plan_exercises_show_disabled">Show disabled</string>
+    <string name="plan_exercise_create_title">Add exercise to plan</string>
+    <string name="plan_exercise_edit_title">Edit plan exercise</string>
+    <string name="plan_exercise_label">Exercise</string>
+    <string name="plan_max_sets_label">Max sets</string>
+    <string name="plan_warmup_sets_label">Warmup sets</string>
+    <string name="plan_target_rpe_label">Target RPE</string>
+    <string name="plan_enabled_label">Enabled</string>
+    <string name="plan_disabled_label">Disabled</string>
+    <string name="plan_exercise_add_action">Add exercise</string>
+    <string name="plan_edit_action">Edit plan</string>
+
     <!-- Iteración 3: EjercicioDetalle. -->
     <string name="exercise_category_none">No category</string>
     <string name="exercise_notes">Notes</string>
@@ -72,6 +106,7 @@
     <string name="action_save">Save</string>
     <string name="action_create">Create</string>
     <string name="action_rename">Rename</string>
+    <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_merge">Merge</string>
     <string name="action_archive">Archive</string>
@@ -112,5 +147,11 @@
     <plurals name="merge_conflicts">
         <item quantity="one">%d conflict registered.</item>
         <item quantity="other">%d conflicts registered.</item>
+    </plurals>
+    <!-- D33: la confirmación de borrado de plan cuenta las sesiones que quedan como sesiones libres,
+    porque es lo que el usuario pierde. -->
+    <plurals name="confirm_delete_plan">
+        <item quantity="one">%d session will remain as a free session.</item>
+        <item quantity="other">%d sessions will remain as free sessions.</item>
     </plurals>
 </resources>

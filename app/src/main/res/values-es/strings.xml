@@ -47,6 +47,35 @@
     <string name="category_delete_title">Borrar categoría</string>
     <string name="category_merge_title">Fusionar categoría en</string>
 
+    <!-- Iteración 4: Planes y PlanDetalle. -->
+    <string name="plans_create_action">Crear plan</string>
+    <string name="plan_title_default">Plan</string>
+    <string name="plan_title_label">Título</string>
+    <string name="plan_days_label">Días</string>
+    <string name="plan_days_none">Sin días</string>
+    <string name="plan_sequence_label">Orden</string>
+    <string name="plan_today_label">Hoy</string>
+    <string name="plan_create_title">Nuevo plan</string>
+    <string name="plan_edit_title">Editar plan</string>
+    <string name="plan_delete_title">Borrar plan</string>
+    <string name="plan_frequency_title">Frecuencia</string>
+    <string name="plan_last_session">Última sesión</string>
+    <string name="plan_sessions_last_30_days">Sesiones en los últimos 30 días</string>
+    <string name="plan_blocked_notice">Hay una sesión abierta para este plan. La plantilla está bloqueada hasta que se cierre.</string>
+    <string name="plan_exercises_title">Ejercicios del plan</string>
+    <string name="plan_exercises_empty">Este plan no tiene ejercicios.</string>
+    <string name="plan_exercises_show_disabled">Mostrar deshabilitados</string>
+    <string name="plan_exercise_create_title">Añadir ejercicio al plan</string>
+    <string name="plan_exercise_edit_title">Editar ejercicio del plan</string>
+    <string name="plan_exercise_label">Ejercicio</string>
+    <string name="plan_max_sets_label">Series máx</string>
+    <string name="plan_warmup_sets_label">Series de calentamiento</string>
+    <string name="plan_target_rpe_label">RPE objetivo</string>
+    <string name="plan_enabled_label">Habilitado</string>
+    <string name="plan_disabled_label">Deshabilitado</string>
+    <string name="plan_exercise_add_action">Añadir ejercicio</string>
+    <string name="plan_edit_action">Editar plan</string>
+
     <!-- Iteración 3: EjercicioDetalle. -->
     <string name="exercise_category_none">Sin categoría</string>
     <string name="exercise_notes">Notas</string>
@@ -70,6 +99,7 @@
     <string name="action_save">Guardar</string>
     <string name="action_create">Crear</string>
     <string name="action_rename">Renombrar</string>
+    <string name="action_edit">Editar</string>
     <string name="action_delete">Borrar</string>
     <string name="action_merge">Fusionar</string>
     <string name="action_archive">Archivar</string>
@@ -117,5 +147,12 @@
         <item quantity="one">%d conflicto registrado.</item>
         <item quantity="other">%d conflictos registrados.</item>
         <item quantity="many">%d conflictos registrados.</item>
+    </plurals>
+    <!-- D33: la confirmación de borrado de plan cuenta las sesiones que quedan como sesiones libres,
+    porque es lo que el usuario pierde. -->
+    <plurals name="confirm_delete_plan">
+        <item quantity="one">%d sesión quedará como sesión libre.</item>
+        <item quantity="other">%d sesiones quedarán como sesiones libres.</item>
+        <item quantity="many">%d sesiones quedarán como sesiones libres.</item>
     </plurals>
 </resources>

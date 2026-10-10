@@ -19,3 +19,7 @@ const val SETTINGS_ROUTE = "settings"
 // Ruta de detalle, no un destino del bottom nav: se llega desde la lista de Ejercicios
 // (views_plan.md). El filtro de categoría es un sheet, no una ruta.
 const val EXERCISE_DETAIL_ROUTE = "exercise/{exerciseId}"
+
+// Ruta de detalle de plan, no un destino del bottom nav: se llega desde la lista de Planes. El quick log
+// no es una ruta, es el FAB contextual, y la ruta de sesión es la iteración 5.
+const val PLAN_DETAIL_ROUTE = "plan/{planId}"

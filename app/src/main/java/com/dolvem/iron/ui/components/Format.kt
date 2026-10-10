@@ -6,9 +6,12 @@ package com.dolvem.iron.ui.components
 import com.dolvem.iron.data.settings.ShortDateFormat
 import com.dolvem.iron.data.settings.StrengthUnit
 import com.dolvem.iron.domain.model.kgToLb
+import com.dolvem.iron.domain.model.parsePlanDays
 import com.dolvem.iron.domain.model.round2
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.Locale
 
 // D28: se aceptan coma y punto y se normalizan a punto, porque en español el teclado produce coma. Es
@@ -31,3 +34,10 @@ fun formatDate(date: LocalDate, format: ShortDateFormat, locale: Locale = Locale
     }
     return DateTimeFormatter.ofPattern(pattern, locale).format(date)
 }
+
+// Nombres de los días de Plan.days en el idioma activo. El parseo es del modelo de dominio (D62), que es
+// el único sitio donde se interpreta la cadena; aquí solo se presenta, con el locale de Compose (D72),
+// porque Locale.getDefault() no respeta localeOverride de D64. Cadena vacía devuelve cadena vacía, que la
+// pantalla muestra como "sin días".
+fun formatDayNames(days: String, locale: Locale): String =
+    parsePlanDays(days).joinToString(", ") { DayOfWeek.of(it).getDisplayName(TextStyle.SHORT, locale) }

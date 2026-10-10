@@ -23,6 +23,7 @@ import androidx.navigation.navArgument
 import com.dolvem.iron.feature.exercises.ExerciseDetailScreen
 import com.dolvem.iron.feature.exercises.ExercisesScreen
 import com.dolvem.iron.feature.history.HistoryScreen
+import com.dolvem.iron.feature.plans.PlanDetailScreen
 import com.dolvem.iron.feature.plans.PlansScreen
 import com.dolvem.iron.feature.settings.SettingsScreen
 import com.dolvem.iron.feature.today.TodayScreen
@@ -68,7 +69,15 @@ fun IronNavHost() {
                 TodayScreen(onOpenSettings = { navController.navigate(SETTINGS_ROUTE) })
             }
             composable(Destination.PLANS.route) {
-                PlansScreen()
+                PlansScreen(onOpenDetail = { planId -> navController.navigate("plan/$planId") })
+            }
+            // El parámetro se declara con IntType, el mismo criterio que exerciseId.
+            composable(
+                PLAN_DETAIL_ROUTE,
+                arguments = listOf(navArgument("planId") { type = NavType.IntType })
+            ) { entry ->
+                val planId = entry.arguments?.getInt("planId") ?: 0
+                PlanDetailScreen(planId)
             }
             composable(Destination.EXERCISES.route) {
                 ExercisesScreen(onOpenDetail = { exerciseId -> navController.navigate("exercise/$exerciseId") })
