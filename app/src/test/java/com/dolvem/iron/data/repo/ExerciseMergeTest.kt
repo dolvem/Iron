@@ -20,7 +20,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -84,8 +83,9 @@ class ExerciseMergeTest {
         assertEquals(1, summary.value.conflicts)
         assertEquals(0, summary.value.remappedPlanExercises)
 
-        val row = db.planExerciseDao().observeForPlan(planId).first()
-        assertNotNull(row)
+        val rows = db.planExerciseDao().observeForPlan(planId).first()
+        assertEquals(1, rows.size)
+        val row = rows.first()
         assertEquals(destination.id, row.exerciseId)
         // Gana la fila existente, con su configuración, no la del origen.
         assertEquals(2, row.sequence)

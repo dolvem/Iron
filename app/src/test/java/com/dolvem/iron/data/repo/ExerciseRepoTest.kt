@@ -6,6 +6,7 @@ package com.dolvem.iron.data.repo
 import android.content.Context
 import androidx.room3.Room
 import androidx.test.core.app.ApplicationProvider
+import com.dolvem.iron.data.db.Category
 import com.dolvem.iron.data.db.ClosedBy
 import com.dolvem.iron.data.db.Exercise
 import com.dolvem.iron.data.db.ExerciseSet
@@ -16,6 +17,7 @@ import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -63,6 +65,21 @@ class ExerciseRepoTest {
         val renamed = repo.renameExercise(exercise, "Sentadilla búlgara") as Outcome.Ok<Exercise>
         assertEquals("Sentadilla búlgara", renamed.value.name)
         assertEquals("sentadilla búlgara", renamed.value.nameKey)
+    }
+
+    // Asignación de categoría: sin Outcome (D5), como el archivado. Asignar, cambiar y quitar.
+    @Test
+    fun setCategoryAssignsChangesAndClears() = runBlocking {
+        val exercise = (repo.createExercise("Sentadilla", null) as Outcome.Ok<Exercise>).value
+        val legs = db.categoryDao().insert(Category(0, "Pierna", "pierna")).toInt()
+        val back = db.categoryDao().insert(Category(0, "Espalda", "espalda")).toInt()
+
+        assertEquals(legs, repo.setCategory(exercise, legs).categoryId)
+
+        val moved = repo.setCategory(exercise, back)
+        assertEquals(back, moved.categoryId)
+
+        assertNull(repo.setCategory(moved, null).categoryId)
     }
 
     // D5: el conteo se hace antes del CASCADE, por eso es un método separado del borrado.

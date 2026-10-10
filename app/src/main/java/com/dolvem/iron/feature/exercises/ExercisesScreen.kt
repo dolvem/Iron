@@ -46,7 +46,9 @@ import com.dolvem.iron.R
 import com.dolvem.iron.data.db.Category
 import com.dolvem.iron.data.db.Exercise
 import com.dolvem.iron.domain.model.Outcome
+import com.dolvem.iron.ui.components.CategoryPickerDialog
 import com.dolvem.iron.ui.components.ConfirmCountDialog
+import com.dolvem.iron.ui.components.CreateExerciseDialog
 import com.dolvem.iron.ui.components.MergeDestinationDialog
 import com.dolvem.iron.ui.components.NameDialog
 import com.dolvem.iron.ui.components.ScreenPlaceholder
@@ -75,6 +77,7 @@ fun ExercisesScreen(onOpenDetail: (Int) -> Unit) {
     var categoryRename by remember { mutableStateOf<Category?>(null) }
     var mergeTarget by remember { mutableStateOf<Exercise?>(null) }
     var categoryMerge by remember { mutableStateOf<Category?>(null) }
+    var categoryMove by remember { mutableStateOf<Exercise?>(null) }
     var confirmation by remember { mutableStateOf<Confirmation?>(null) }
 
     fun quantity(res: Int, count: Int): String = resources.getQuantityString(res, count, count)
@@ -165,7 +168,8 @@ fun ExercisesScreen(onOpenDetail: (Int) -> Unit) {
                     viewModel.setFilter(state.filter.query, state.filter.categoryId, show)
                 },
                 // El crear entra por la barra: la lista es de filtrar y acceder, y el CRUD se usa sobre
-                // todo en el setup inicial (views_plan.md). El nombre se envía con la categoría del filtro.
+                // todo en el setup inicial (views_plan.md). El diálogo de creación tiene su propio
+                // selector de categoría; el filtro solo filtra.
                 onCreate = { createOpen = true }
             )
 
@@ -188,6 +192,7 @@ fun ExercisesScreen(onOpenDetail: (Int) -> Unit) {
                             categoryName = state.categories.find { it.id == exercise.categoryId }?.name,
                             onOpen = { onOpenDetail(exercise.id) },
                             onRename = { exerciseRename = exercise },
+                            onMoveToCategory = { categoryMove = exercise },
                             onMerge = { mergeTarget = exercise },
                             onDelete = { confirmExerciseDelete(exercise) },
                             onArchive = { scope.launch { viewModel.setArchived(exercise, !exercise.archived) } }
@@ -199,14 +204,17 @@ fun ExercisesScreen(onOpenDetail: (Int) -> Unit) {
     }
 
     if (createOpen) {
-        NameDialog(
+        // La creación no hereda la categoría del filtro activo: el diálogo tiene su propio selector,
+        // porque el filtro cambia lo que se ve, no lo que se asigna.
+        CreateExerciseDialog(
             title = stringResource(R.string.exercise_create_title),
-            label = stringResource(R.string.exercise_name_label),
-            initial = "",
+            nameLabel = stringResource(R.string.exercise_name_label),
+            categoryLabel = stringResource(R.string.exercise_category_label),
             actionLabel = stringResource(R.string.action_create),
-            onSubmit = { name ->
+            categories = state.categories,
+            onCreate = { name, categoryId ->
                 createOpen = false
-                scope.launch { report(viewModel.createExercise(name, state.filter.categoryId)) }
+                scope.launch { report(viewModel.createExercise(name, categoryId)) }
             },
             onDismiss = { createOpen = false }
         )
@@ -270,6 +278,21 @@ fun ExercisesScreen(onOpenDetail: (Int) -> Unit) {
                 confirmCategoryMerge(categorySource, destination)
             },
             onDismiss = { categoryMerge = null }
+        )
+    }
+
+    val moveSource = categoryMove
+    if (moveSource != null) {
+        // La asignación no tiene error de negocio esperado (D5), así que no hay Outcome que reportar.
+        CategoryPickerDialog(
+            title = stringResource(R.string.action_move_to_category),
+            categories = state.categories,
+            selectedId = moveSource.categoryId,
+            onSelect = { categoryId ->
+                categoryMove = null
+                scope.launch { viewModel.setCategory(moveSource, categoryId) }
+            },
+            onDismiss = { categoryMove = null }
         )
     }
 
@@ -351,6 +374,7 @@ private fun ExerciseRow(
     categoryName: String?,
     onOpen: () -> Unit,
     onRename: () -> Unit,
+    onMoveToCategory: () -> Unit,
     onMerge: () -> Unit,
     onDelete: () -> Unit,
     onArchive: () -> Unit
@@ -391,6 +415,13 @@ private fun ExerciseRow(
                 onClick = {
                     menuOpen = false
                     onRename()
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_move_to_category)) },
+                onClick = {
+                    menuOpen = false
+                    onMoveToCategory()
                 }
             )
             DropdownMenuItem(

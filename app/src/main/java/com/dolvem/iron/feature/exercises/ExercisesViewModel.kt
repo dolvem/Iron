@@ -68,6 +68,11 @@ class ExercisesViewModel(private val container: AppContainer) : ViewModel() {
     suspend fun setArchived(exercise: Exercise, archived: Boolean): Exercise =
         container.exerciseRepo.setArchived(exercise, archived)
 
+    // D5: la asignación de categoría no tiene error de negocio esperado, así que no devuelve Outcome,
+    // como el archivado. El valor null es "sin categoría".
+    suspend fun setCategory(exercise: Exercise, categoryId: Int?): Exercise =
+        container.exerciseRepo.setCategory(exercise, categoryId)
+
     // D5: la preconsulta de conteo es un método separado del borrado, y es lo que permite la
     // confirmación con conteo de afectados de D40.
     suspend fun affectedSets(exercise: Exercise): Int = container.exerciseRepo.affectedSets(exercise.id)

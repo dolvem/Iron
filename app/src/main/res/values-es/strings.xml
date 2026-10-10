@@ -33,7 +33,11 @@
     <string name="exercise_delete_title">Borrar ejercicio</string>
     <string name="exercise_merge_title">Fusionar ejercicio en</string>
     <string name="exercise_name_label">Nombre</string>
+    <string name="exercise_category_label">Categoría</string>
     <string name="exercise_merge_hint">Elige el destino. Su nombre sobrevive.</string>
+    <!-- Asignación de categoría: el diálogo de creación tiene su propio selector, y la fila tiene la
+    acción de mover. La UI no hereda la categoría del filtro activo. -->
+    <string name="action_move_to_category">Mover a categoría</string>
 
     <!-- Iteración 3: CRUD de categorías. -->
     <string name="categories_title">Categorías</string>

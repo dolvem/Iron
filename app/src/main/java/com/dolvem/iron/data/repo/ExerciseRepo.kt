@@ -85,6 +85,14 @@ class ExerciseRepo(
         return updated
     }
 
+    // D5: la asignación de categoría no tiene error de negocio esperado, así que no devuelve Outcome,
+    // igual que el archivado: devuelve la entidad. El valor null es "sin categoría".
+    suspend fun setCategory(exercise: Exercise, categoryId: Int?): Exercise {
+        val updated = exercise.copy(categoryId = categoryId)
+        dao.update(updated)
+        return updated
+    }
+
     // D5: la preconsulta es un método separado del borrado. Es una lectura, así que no devuelve
     // Outcome: devuelve el conteo simple que la confirmación de la iteración 3 muestra.
     suspend fun affectedSets(exerciseId: Int): Int = dao.countSets(exerciseId)
