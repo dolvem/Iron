@@ -1,20 +1,36 @@
 <!-- SPDX-FileCopyrightText: 2026 dolvem -->
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 
-# Iteración 4 — Planes (en curso)
+# Iteración 4 — Planes (cerrada)
 
 Bloque de `docs/state/todo.md`. Decisiones del bloque: D8, D33 y D67.
 
-- [ ] CRUD de planes y de `PlanExercise`: orden, `maxSets`, `warmupSets`, `targetRpe`, `enabled`.
-- [ ] Frecuencia en el detalle: última sesión y sesiones en los últimos 30 días (ventana móvil desde hoy, 30 días naturales incluyendo hoy).
-- [ ] Las sesiones libres no cuentan en la frecuencia ni en la adherencia de ningún plan (D8).
-- [ ] Pantalla Planes: lista ordenada por `sequence` (nulos al final), con el plan de hoy resaltado.
-- [ ] Pantalla PlanDetalle: solo configuración, bloqueada mientras hay una sesión abierta.
-- [ ] `Plan.title` nulo se muestra como `Plan`.
-- [ ] Borrado de plan: confirmación que avisa que las sesiones quedan como sesiones libres, con conteo de esas sesiones; bloqueado mientras haya una sesión abierta (D33).
-- [ ] Quick log FAB desde PlanDetalle: preselecciona el ejercicio del plan.
+- [x] CRUD de planes y de `PlanExercise`: orden, `maxSets`, `warmupSets`, `targetRpe`, `enabled`.
+- [x] Frecuencia en el detalle: última sesión y sesiones en los últimos 30 días (ventana móvil desde hoy, 30 días naturales incluyendo hoy).
+- [x] Las sesiones libres no cuentan en la frecuencia ni en la adherencia de ningún plan (D8).
+- [x] Pantalla Planes: lista ordenada por `sequence` (nulos al final), con el plan de hoy resaltado.
+- [x] Pantalla PlanDetalle: solo configuración, bloqueada mientras hay una sesión abierta.
+- [x] `Plan.title` nulo se muestra como `Plan`.
+- [x] Borrado de plan: confirmación que avisa que las sesiones quedan como sesiones libres, con conteo de esas sesiones; bloqueado mientras haya una sesión abierta (D33).
+- [x] Quick log FAB desde PlanDetalle: preselecciona el ejercicio del plan.
 
 ## Notas del bloque
 
 - `PlanFrequencyTest.frequencyReemitsWhenASessionIsInserted` fallaba de forma intermitente. Room invalida las dos consultas del `combine` por separado, así que el orden de la reemisión no está garantizado y el `combine` puede emitir primero el estado intermedio `(null, 1)` antes de reejecutar la consulta de última sesión. El test ahora acepta el intermedio y afirma el estado final. Dos pasadas con `--rerun-tasks` limpias.
 - Firmas de lectura: `PlanDao.observeAll()`, `PlanExerciseDao.observeForPlan()` y `PlanExerciseDao.observeForPlanIncludingDisabled()` pasan a `Flow<List<T>>` (D67), la firma que ya usan `CategoryDao`, `ExerciseDao.search` y `SetDao`. `ExerciseDao.observeAll()` y `ExerciseDao.observeAllIncludingArchived()` quedan pendientes de alinear en la pasada de Historial, para no dejar las dos firmas conviviendo. Los tests que hoy pasan con `Flow<T>` lo hacen porque provocan la invalidación con una escritura; con la lista se afirma el resultado completo en la emisión inicial.
+- Tests del bloque: `PlanRepoTest` (crear, editar título/días/orden, bloqueo de edición y borrado con sesión abierta, `unique(planId, exerciseId)` mapeado a `DuplicateName` con el nombre del ejercicio, preconsulta de D33 separada del borrado con las sesiones sobrevivientes como sesiones libres, orden por `sequence` con nulos al final, `enabled = false` excluido por defecto y mostrado con el filtro), `PlanFrequencyTest` (D8: la última sesión por `sessionDate`, empate resuelto por `startedAt` descendente, la ventana de 30 días naturales incluyendo hoy, libres excluidas, sesión abierta contada, ventana vacía) y `PlanDaysTest` (formato canónico y `planMatchesDay`, D62). Los ViewModel no tienen test: D18 y D19 dejan la UI fuera de la matriz.
+- Verificado en emulador (`emulator-5554`, API 31, `sdk_gphone64_x86_64`, densidad 420, `uiautomator dump` y capturas): flujo navegable Planes → PlanDetalle → quick log. Targets de 48dp medidos en el icono de crear plan, el icono de acciones de fila, el `FilterChip` de "Show disabled" (el chip visual es de 32dp, el contenedor clicable llega a 48), los chips de días del formulario, las filas del selector de ejercicio, la fila del `Switch` de habilitado, los `DropdownMenuItem` y el botón Confirm de la confirmación; la fila de la lista es de 64dp. `contentDescription` en los iconos: `Create plan`, `Actions for <título>`, `Edit plan`, `Add exercise`, `Quick log`. Escala de fuente 1,3 sin recortes. Dynamic color activo, porque el tema siempre usa `dynamicLightColorScheme`; contraste medido sobre la captura: 13,3:1 en la fila resaltada y 16,4:1 en el resto de la pantalla.
+- El resaltado del plan de hoy usa `secondaryContainer` con el color de contenido emparejado `onSecondaryContainer`, no `onSurface`: con paleta dinámica ese es el pairing garantizado, y `onSurface` sobre `secondaryContainer` no lo está.
+- Orden y resaltado verificados en emulador con dos planes, uno con los días de hoy y `sequence` 1 y otro con `days = "1"` y `sequence` nulo: el de `sequence` 1 aparece primero, resaltado con la etiqueta "Today", y el de `sequence` nulo al final. Con la fecha del emulador en domingo el resaltado cae en el plan con el día 7.
+- Frecuencia verificada en emulador con sesiones insertadas directamente en la BD: última sesión 10/11/2026 y 2 sesiones en la ventana, con una sesión libre y una fuera de la ventana que no cuentan. Con una sesión abierta para el plan el detalle muestra el aviso de bloqueo y el conteo sube a 3; el icono de editar plan, el de añadir ejercicio y el menú de la fila quedan `enabled="false"`.
+- Confirmación de borrado de plan verificada en emulador con el conteo de 4 sesiones. Con sesión abierta el borrado devuelve el error del repositorio y se muestra en el snackbar, porque la UI no valida y el error siempre viene del repositorio (D5, D6).
+- Borrar una fila de la plantilla es directo, sin confirmación: D40 pide confirmación con conteo para las entidades grandes, y una fila no toca las series ya registradas, porque las series apuntan al ejercicio y a la sesión, no a la plantilla. No hay elementos afectados que contar.
+- El quick log FAB se oculta cuando el plan no tiene filas, porque no hay ejercicio que preseleccionar. Con filas preselecciona el primero en el orden de la plantilla, que es el que la pantalla muestra primero, y el sheet abre con ese ejercicio.
+- El CRUD del plan está en las filas de la lista (crear en la cabecera, borrar en la fila), como en Ejercicios (D69); el detalle es solo configuración, y ahí viven el formulario de título, días y orden y el CRUD de las filas. La fila de la plantilla no es clicable: el CRUD está en el menú de acciones, que es el target táctico.
+- Los nombres de los días salen de `DayOfWeek.getDisplayName(TextStyle.SHORT, locale)` con el locale de Compose (D72), así que no hay cadenas nuevas para los días. El formato canónico de `days` (D62) se escribe en el ViewModel con `formatPlanDays`, que es la única función de escritura del dominio; la UI solo pasa la selección. Verificado en emulador: seleccionar miércoles sobre un plan que ya tenía domingo guarda `3,7` y la pantalla muestra `Wed, Sun`.
+- El formulario de días usa `LazyRow` con `FilterChip`, porque `FlowRow` sigue experimental.
+- Los candidatos del selector de ejercicio se leen con query vacía y con archived, el mismo criterio de la fusión de la iteración 3: una fila de la plantilla puede apuntar a un ejercicio archivado, y el filtro de la pantalla no debe limitar lo que el usuario elige. Con esa misma lectura se resuelven los nombres de las filas, así que no hay POJO de vista nuevo.
+- Los campos numéricos de la fila admiten null, que es "sin asignar" (D37). Al crear se prerellenan con el default de Ajustes cuando está asignado; `sequence` es obligatorio porque la columna no es nullable, así que al crear se propone la siguiente posición. La UI no valida el rango orientativo de `targetRpe` (D37, D6).
+- Los `RadioButton` del selector de ejercicio y la fila del `Switch` de habilitado llevan `Modifier.semantics(mergeDescendants = true)` (D71), el arreglo que en Ejercicios queda pendiente para la iteración 11.
+- Ruta nueva `plan/{planId}` con `navArgument` declarado con `NavType.IntType`, el defecto encontrado en la iteración 3.
+- Pendiente de verificación manual: la alternativa textual de los valores por bucket en las gráficas (D35) no aplica en este bloque, porque Planes no pinta gráficas.

@@ -13,7 +13,7 @@ El estado y las notas de cada bloque viven en su fichero de `docs/iterations/`; 
 | 1 | Scaffolding | cerrada | `iterations/01-scaffolding.md` |
 | 2 | Capa de datos | cerrada | `iterations/02-capa-de-datos.md` |
 | 3 | Ejercicios | cerrada | `iterations/03-ejercicios.md` |
-| 4 | Planes | en curso | `iterations/04-planes.md` |
+| 4 | Planes | cerrada | `iterations/04-planes.md` |
 | 5 | Sesión | pendiente | `iterations/05-sesion.md` |
 | 6 | Hoy | pendiente | `iterations/06-hoy.md` |
 | 7 | Historial | pendiente | `iterations/07-historial.md` |
