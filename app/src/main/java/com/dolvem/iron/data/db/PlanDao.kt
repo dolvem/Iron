@@ -28,7 +28,7 @@ interface PlanDao {
     // sequence, con los nulos al final. SQLite pone los nulos al principio, así que la clave
     // IS NULL va delante.
     @Query("SELECT * FROM Plan ORDER BY sequence IS NULL, sequence")
-    fun observeAll(): Flow<Plan>
+    fun observeAll(): Flow<List<Plan>>
 
     @Query("SELECT * FROM Plan WHERE id = :planId")
     fun observeById(planId: Int): Flow<Plan?>

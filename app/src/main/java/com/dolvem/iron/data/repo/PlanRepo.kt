@@ -14,9 +14,16 @@ import com.dolvem.iron.domain.model.Outcome
 import com.dolvem.iron.domain.model.localToday
 import com.dolvem.iron.domain.model.planMatchesDay
 import java.time.Clock
+import java.time.LocalDate
 import java.time.ZoneId
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+
+// D8: frecuencia del detalle del plan, la última sesión y las sesiones de la ventana móvil de 30 días
+// naturales incluyendo hoy. Es una lectura, así que sale como data class sobre el Flow, sin Outcome (D5),
+// el mismo estilo que los data classes de Analytics.
+data class PlanFrequency(val lastSessionDate: LocalDate?, val sessionsLast30Days: Int)
 
 // D5: la violación de unique(planId, exerciseId) se captura aquí y se mapea con mapConstraintViolation.
 // Cualquier otra excepción se propaga, que es la reserva de excepciones para fallos de I/O y de base de
@@ -37,13 +44,13 @@ class PlanRepo(
 
     // Reglas de orden: los planes por sequence con los nulos al final, y los ejercicios del plan por
     // sequence. enabled = false queda excluido por defecto, con la variante para el filtro que lo muestra.
-    fun observeAll(): Flow<Plan> = planDao.observeAll()
+    fun observeAll(): Flow<List<Plan>> = planDao.observeAll()
 
     fun observeById(planId: Int): Flow<Plan?> = planDao.observeById(planId)
 
-    fun observeExercises(planId: Int): Flow<PlanExercise> = planExerciseDao.observeForPlan(planId)
+    fun observeExercises(planId: Int): Flow<List<PlanExercise>> = planExerciseDao.observeForPlan(planId)
 
-    fun observeExercisesIncludingDisabled(planId: Int): Flow<PlanExercise> =
+    fun observeExercisesIncludingDisabled(planId: Int): Flow<List<PlanExercise>> =
         planExerciseDao.observeForPlanIncludingDisabled(planId)
 
     fun observeExerciseById(planExerciseId: Int): Flow<PlanExercise?> = planExerciseDao.observeById(planExerciseId)
@@ -51,6 +58,21 @@ class PlanRepo(
     // D62: el repositorio expone la cadena y el dominio la parsea. Aquí solo se resuelve la coincidencia
     // con hoy, que es lo que justifica Clock y ZoneId (D17). Cadena vacía significa "nunca".
     fun matchesToday(plan: Plan): Boolean = planMatchesDay(plan.days, localToday(clock, zone))
+
+    // D8: frecuencia del detalle del plan, la ventana móvil de 30 días naturales incluyendo hoy, así que
+    // start es hoy menos 29. El start se resuelve al empezar la colección, y con Clock y ZoneId
+    // inyectados (D17) la ventana es determinista en los tests.
+    // D8: las sesiones libres no cuentan en la frecuencia porque el filtro es por planId, y una sesión
+    // libre no tiene plan al que atribuirse. La sesión abierta sí cuenta, porque es una sesión que
+    // ocurrió: el conteo no mira endedAt.
+    // D5: las lecturas devuelven Flow directo, sin Outcome.
+    fun observeFrequency(planId: Int): Flow<PlanFrequency> {
+        val start = localToday(clock, zone).minusDays(29)
+        return combine(
+            workoutDao.observeLastSessionForPlan(planId),
+            workoutDao.observeSessionCountFrom(planId, start)
+        ) { last, count -> PlanFrequency(last?.sessionDate, count) }
+    }
 
     // D5: la preconsulta de conteo es un método separado del borrado, y es una lectura, así que no
     // devuelve Outcome. Son las filas de la plantilla que se lleva el CASCADE de la FK de Plan.

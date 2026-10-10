@@ -29,10 +29,10 @@ interface PlanExerciseDao {
     // por sequence. enabled = false queda excluido por defecto, con la variante para el filtro que
     // lo muestra.
     @Query("SELECT * FROM PlanExercise WHERE planId = :planId AND enabled = 1 ORDER BY sequence")
-    fun observeForPlan(planId: Int): Flow<PlanExercise>
+    fun observeForPlan(planId: Int): Flow<List<PlanExercise>>
 
     @Query("SELECT * FROM PlanExercise WHERE planId = :planId ORDER BY sequence")
-    fun observeForPlanIncludingDisabled(planId: Int): Flow<PlanExercise>
+    fun observeForPlanIncludingDisabled(planId: Int): Flow<List<PlanExercise>>
 
     @Query("SELECT * FROM PlanExercise WHERE id = :planExerciseId")
     fun observeById(planExerciseId: Int): Flow<PlanExercise?>

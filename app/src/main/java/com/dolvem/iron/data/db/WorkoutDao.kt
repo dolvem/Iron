@@ -54,4 +54,19 @@ interface WorkoutDao {
     // D33: la confirmación de borrado de plan cuenta las sesiones que quedan como sesiones libres.
     @Query("SELECT COUNT(*) FROM Workout WHERE planId = :planId")
     suspend fun countSessions(planId: Int): Int
+
+    // D8: frecuencia del detalle del plan, la última sesión por sessionDate descendente (reglas de
+    // orden). Aquí no vale el índice (planId, endedAt) de D1, porque la frecuencia mira también las
+    // sesiones cerradas. El desempate es startedAt descendente, para que con dos sesiones del mismo día
+    // la última sea la más reciente.
+    @Query("SELECT * FROM Workout WHERE planId = :planId ORDER BY sessionDate DESC, startedAt DESC LIMIT 1")
+    fun observeLastSessionForPlan(planId: Int): Flow<Workout?>
+
+    // D8: sesiones del plan en la ventana móvil de 30 días naturales incluyendo hoy, así que el
+    // parámetro start es hoy menos 29. Las sesiones libres no cuentan porque el filtro es por planId, y
+    // la sesión abierta sí cuenta: el conteo no mira endedAt.
+    // D62: sessionDate es TEXT con fecha ISO, así que la comparación lexicográfica de >= es la
+    // comparación cronológica.
+    @Query("SELECT COUNT(*) FROM Workout WHERE planId = :planId AND sessionDate >= :start")
+    fun observeSessionCountFrom(planId: Int, start: LocalDate): Flow<Int>
 }
