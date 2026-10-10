@@ -87,6 +87,10 @@ private fun Identity(state: ExerciseDetailState, exercise: Exercise) {
             state.category?.name ?: stringResource(R.string.exercise_category_none),
             style = MaterialTheme.typography.bodyMedium
         )
+        // El detalle de un archivado se lee como archivado, la misma etiqueta que la fila de la lista.
+        if (exercise.archived) {
+            Text(stringResource(R.string.exercises_archived), style = MaterialTheme.typography.bodySmall)
+        }
         if (state.settings.showNotes && !exercise.notes.isNullOrBlank()) {
             Text(stringResource(R.string.exercise_notes), style = MaterialTheme.typography.titleSmall)
             Text(exercise.notes.orEmpty(), style = MaterialTheme.typography.bodyMedium)

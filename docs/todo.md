@@ -150,8 +150,13 @@ Tests del bloque: `ConstraintMappingTest` (JUnit4, puro) y `ExerciseRepoTest` (R
   historial se mueve a la iteración 7 y la de las gráficas del detalle a la iteración 8, que son donde se
   escriben esas pantallas. La mitad de datos queda fijada por `AnalyticsTest.archivedExerciseStillProducesMetrics`:
   `Analytics` lee por `exerciseId` sin mirar `archived`, así que el detalle de un archivado conserva PR,
-  valor actual y volumen semanal. Pendiente de verificar en emulador: la etiqueta `Archived` en la
-  identidad del detalle, que hoy solo se pinta en la fila de la lista.
+  valor actual y volumen semanal.
+- Verificado en emulador (AVD `iron_api31`, densidad 420, `uiautomator dump` y captura), con un ejercicio
+  archivado en la BD: la lista muestra el estado vacío; con el filtro activo aparece la fila con la etiqueta
+  `Archived`, y el detalle pinta esa misma etiqueta en la identidad, junto a categoría, notas, estadísticas
+  (PR 100.00, valor actual 100.00, volumen semanal 1000.00) y el último registro. El quick log FAB sigue
+  presente. Para eso se añade la etiqueta `Archived` en la identidad del detalle, que antes solo se pintaba
+  en la fila de la lista.
 - `FlowTest.cancellingTheCollectorStopsEmissions` fallaba de forma intermitente: Turbine arranca el
   colector antes del insert, y Room lanza `IllegalStateException` ("The query result was empty, but
   expected a single row") sobre un `Flow<Exercise>` con tabla vacía. Se inserta la fila antes de

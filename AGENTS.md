@@ -27,5 +27,5 @@
 
 ## Git
 
-- `docs/` está gitignored: el plan se queda local y no sube al repositorio.
+- `docs/` se versiona: el plan de desarrollo sube al repositorio.
 - No se commitean `local.properties`, claves, `keystore.properties` ni APKs (D48, D54).
