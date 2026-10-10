@@ -26,11 +26,13 @@ interface ExerciseDao {
     suspend fun delete(exercise: Exercise)
 
     // D5: las lecturas devuelven Flow directo, sin Outcome. Reglas de orden: los ejercicios por
-    // nombre. archived queda excluido por defecto, con la variante para el filtro que lo muestra.
-    @Query("SELECT * FROM Exercise WHERE archived = 0 ORDER BY name")
+    // nombre, que es nameKey: la colación por defecto de SQLite es BINARY, y ORDER BY name pondría
+    // "Zapada" antes que "gemelo". archived queda excluido por defecto, con la variante para el filtro
+    // que lo muestra.
+    @Query("SELECT * FROM Exercise WHERE archived = 0 ORDER BY nameKey")
     fun observeAll(): Flow<Exercise>
 
-    @Query("SELECT * FROM Exercise ORDER BY name")
+    @Query("SELECT * FROM Exercise ORDER BY nameKey")
     fun observeAllIncludingArchived(): Flow<Exercise>
 
     @Query("SELECT * FROM Exercise WHERE id = :exerciseId")
@@ -45,13 +47,14 @@ interface ExerciseDao {
     // SQLite solo pliega ASCII. El patrón llega ya normalizado desde el repositorio. archived queda
     // excluido por defecto con la variante que lo muestra (reglas de orden), y el filtro de categoría
     // admite null, que es "todas las categorías". Devuelve la lista completa porque la pantalla pinta
-    // todos los resultados, a diferencia de las lecturas por fila de la iteración 2.
+    // todos los resultados, a diferencia de las lecturas por fila de la iteración 2. El orden es por
+    // nameKey, la misma columna de D4, por la colación BINARY de SQLite.
     @Query(
         "SELECT * FROM Exercise " +
             "WHERE nameKey LIKE :pattern " +
             "AND (:categoryId IS NULL OR categoryId = :categoryId) " +
             "AND (:showArchived OR archived = 0) " +
-            "ORDER BY name"
+            "ORDER BY nameKey"
     )
     fun search(pattern: String, categoryId: Int?, showArchived: Boolean): Flow<List<Exercise>>
 

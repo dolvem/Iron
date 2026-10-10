@@ -25,9 +25,9 @@ interface CategoryDao {
     suspend fun delete(category: Category)
 
     // D5: las lecturas devuelven Flow directo, sin Outcome. Las categorías se ordenan por nombre
-    // (reglas de orden). Devuelve la lista completa porque la barra de filtros pinta todas, a
-    // diferencia de las lecturas por fila de la iteración 2.
-    @Query("SELECT * FROM Category ORDER BY name")
+    // (reglas de orden), que es nameKey por la colación BINARY de SQLite. Devuelve la lista completa
+    // porque la barra de filtros pinta todas, a diferencia de las lecturas por fila de la iteración 2.
+    @Query("SELECT * FROM Category ORDER BY nameKey")
     fun observeAll(): Flow<List<Category>>
 
     @Query("SELECT * FROM Category WHERE id = :categoryId")

@@ -83,4 +83,14 @@ class CategoryRepoTest {
         assertEquals(destination.id, after?.categoryId)
         assertNull(db.categoryDao().observeById(origin.id).first())
     }
+
+    // Reglas de orden: las categorías por nombre, que es nameKey por la colación BINARY de SQLite.
+    @Test
+    fun orderUsesNameKeySoItIsCaseInsensitive() = runBlocking {
+        categories.createCategory("Pierna")
+        categories.createCategory("gemelos")
+
+        val all = categories.observeAll().first()
+        assertEquals(listOf("gemelos", "Pierna"), all.map { it.name })
+    }
 }

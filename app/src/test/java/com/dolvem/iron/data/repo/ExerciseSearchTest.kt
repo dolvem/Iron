@@ -86,6 +86,17 @@ class ExerciseSearchTest {
         assertEquals(2, repo.search("", null, true).first().size)
     }
 
+    // Reglas de orden: los ejercicios por nombre, que es nameKey. Con la colación BINARY de SQLite,
+    // ORDER BY name pondría "Zapada" antes que "gemelo".
+    @Test
+    fun orderUsesNameKeySoItIsCaseInsensitive() = runBlocking {
+        repo.createExercise("Zapada", null)
+        repo.createExercise("gemelo", null)
+
+        val all = repo.search("", null, false).first()
+        assertEquals(listOf("gemelo", "Zapada"), all.map { it.name })
+    }
+
     // El filtro de categoría admite null, que es "todas las categorías", y el orden es por nombre.
     @Test
     fun categoryFilterAndOrderByName() = runBlocking {

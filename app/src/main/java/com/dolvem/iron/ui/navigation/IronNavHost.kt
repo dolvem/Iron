@@ -14,10 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.dolvem.iron.feature.exercises.ExerciseDetailScreen
 import com.dolvem.iron.feature.exercises.ExercisesScreen
 import com.dolvem.iron.feature.history.HistoryScreen
@@ -71,7 +73,12 @@ fun IronNavHost() {
             composable(Destination.EXERCISES.route) {
                 ExercisesScreen(onOpenDetail = { exerciseId -> navController.navigate("exercise/$exerciseId") })
             }
-            composable(EXERCISE_DETAIL_ROUTE) { entry ->
+            // El parámetro se declara con IntType. Sin navArgument la ruta lo entrega como String y
+            // getInt devuelve 0, así que el detalle siempre caía en el estado vacío.
+            composable(
+                EXERCISE_DETAIL_ROUTE,
+                arguments = listOf(navArgument("exerciseId") { type = NavType.IntType })
+            ) { entry ->
                 val exerciseId = entry.arguments?.getInt("exerciseId") ?: 0
                 ExerciseDetailScreen(exerciseId)
             }
