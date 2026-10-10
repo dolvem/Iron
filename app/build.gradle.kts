@@ -72,6 +72,9 @@ android {
         // jdk.internal.access.SharedSecrets, que java.base no exporta a los módulos anónimos.
         unitTests.all {
             it.jvmArgs("--add-exports", "java.base/jdk.internal.access=ALL-UNNAMED")
+            // El worker de tests no hereda el -Xmx del daemon: con Robolectric el default de 512m se queda corto.
+            it.maxHeapSize = "1g"
+            it.maxParallelForks = 4
         }
     }
 

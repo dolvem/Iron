@@ -27,8 +27,13 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper/dists
+            # Robolectric descarga android-all en ~/.m2; sin esta línea se descarga en cada run.
+            ~/.m2/repository
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', '**/*.gradle.kts') }}
           restore-keys: ${{ runner.os }}-gradle-
 
+      # D49: el gate es build, que ya depende de check (ktlintCheck, lint, test). Los cuatro
+      # nombres se escriben igual por claridad, pero dentro de una invocación Gradle ejecuta
+      # cada tarea una sola vez.
       - name: Check
         run: ./gradlew ktlintCheck lint test build
