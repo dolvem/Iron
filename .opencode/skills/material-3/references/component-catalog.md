@@ -20,6 +20,19 @@ with Jetpack Compose as the primary implementation path:
 - Expect expressive variants to include richer visual style, motion, and flexible
   configuration.
 
+**Availability against the pinned BOM (material3 1.4.0):** in 1.4.0-beta01 all APIs tagged
+`ExperimentalMaterial3ExpressiveApi` were removed; they continue in the 1.5.0-alpha series and
+many were promoted to stable in 1.5.0-beta01 (October 2026): `ButtonGroup`, `ToggleButton`
+variants, `SplitButton`, `FloatingActionButtonMenu`, expressive menu items, expressive list
+items, flexible app bars, `WavyProgressIndicator`, `ScrollField`, `MaterialShapes`, emphasized
+typography, `materialExpressTheme` / `expressiveLightColorScheme`. In the pinned BOM only the
+tokens exist for these components — build with the stable APIs available in 1.4.0 (see D80).
+
+**New stable in the pinned BOM (1.4.0):** `HorizontalCenteredHeroCarousel`,
+`VerticalDragHandle`, `SecureTextField` / `OutlinedSecureTextField`, `Text` with `autoSize`
+(useful for the font-scale checks, D35), Pull to refresh, and Material Symbols as the
+recommended icon source (`androidx.compose.material.icons` is no longer published).
+
 ## Actions
 
 ### Buttons
@@ -48,18 +61,20 @@ TextButton(onClick = { /* inline */ }) { Text("Learn more") }
 ```
 
 **Button sizes (Expressive)**: 5 sizes — extra-small, small (default), medium, large,
-extra-large — via `ButtonDefaults.buttonColors`/size APIs per BOM. Toggle buttons exist in
-the expressive set.
+extra-large — via `ButtonSize` APIs (promoted in 1.5.0-beta01; not in the pinned BOM 1.4.0).
+Toggle buttons exist in the expressive set (also 1.5.0-beta01+).
 
 ### Button group
 
 Grouping related actions with connected visual treatment. Compose: `ButtonGroup` /
-`ButtonGroupDefaults` (Expressive, per BOM).
+`ButtonGroupDefaults` (promoted to stable in 1.5.0-beta01; not in the pinned BOM 1.4.0).
 
 ```kotlin
-// Expressive, per BOM
-ButtonGroup(selectedIndex = 0, options = listOf("Day", "Week", "Month")) { index ->
-    ButtonGroupItem(onClick = { select(index) }) { Text(options[index]) }
+// Not available in the pinned BOM (1.4.0); arrives in 1.5.0-beta01+
+ButtonGroup {
+    ButtonGroupItem(onClick = { select(0) }) { Text("Day") }
+    ButtonGroupItem(onClick = { select(1) }) { Text("Week") }
+    ButtonGroupItem(onClick = { select(2) }) { Text("Month") }
 }
 ```
 
@@ -98,7 +113,14 @@ ExtendedFloatingActionButton(
 
 ### FAB menu
 
-Expandable FAB with menu items (Expressive, per BOM).
+Expandable FAB with menu items (Expressive; `FloatingActionButtonMenu` promoted in
+1.5.0-beta01, not in the pinned BOM — see D80 below).
+
+Iron (D80): `FloatingActionButtonMenu` and `ToggleFloatingActionButton` are not in material3 1.4.0,
+the version the pinned BOM resolves to; only the tokens are present. The FAB menu of Exercises is
+built with `FloatingActionButton` + `DropdownMenu` anchored above the FAB. Conscious deviation from
+the Expressive component, not from the rule. The FAB menu APIs were promoted to stable in
+1.5.0-beta01 (October 2026); revisit when the BOM is bumped.
 
 ### Icon button
 
@@ -111,7 +133,8 @@ Expandable FAB with menu items (Expressive, per BOM).
 | Filled tonal | `FilledTonalIconButton` |
 | Outlined | `OutlinedIconButton` |
 
-Toggle behavior available (Expressive, per BOM). Always provide `contentDescription`; for
+Toggle behavior available (`IconToggleButton`; expressive toggle variants promoted in
+1.5.0-beta01, not in the pinned BOM). Always provide `contentDescription`; for
 toggle buttons, descriptive labels for both states.
 
 ```kotlin
@@ -133,7 +156,8 @@ SegmentedButton(selected = listOf(activeIndex), onSelectionChanged = { select(it
 
 ### Split button
 
-Primary action + attached menu (Expressive, per BOM).
+Primary action + attached menu. Compose: `SplitButton` (promoted to stable in 1.5.0-beta01;
+not in the pinned BOM 1.4.0).
 
 ### Badge
 
@@ -148,7 +172,8 @@ BadgedBox(badge = { Badge { Text("3") } }) {
 ### Progress indicator
 
 Linear and circular, determinate/indeterminate. Compose: `LinearProgressIndicator`,
-`CircularProgressIndicator`. Add an accessible label for context (e.g. "Loading").
+`CircularProgressIndicator`, `WavyProgressIndicator` (promoted to stable in 1.5.0-beta01; not in
+the pinned BOM 1.4.0). Add an accessible label for context (e.g. "Loading").
 
 ```kotlin
 LinearProgressIndicator(progress = { 0.6f })          // determinate
@@ -208,11 +233,14 @@ OutlinedCard(onClick = { open(id) }) {
 
 ### Carousel
 
-Multi-browse, uncontained, hero. Compose: `HorizontalCarousel` (ExperimentalMaterial3Api).
+Multi-browse, uncontained, hero. Compose: `HorizontalMultiBrowseCarousel`,
+`HorizontalUncontainedCarousel`, `HorizontalCenteredHeroCarousel` (stable in the pinned BOM;
+`CarouselState` controls the state).
 
 ### Dialog
 
-Basic and full-screen. Compose: `AlertDialog`, `FullScreenDialog` (Expressive, per BOM).
+Basic and full-screen. Compose: `AlertDialog`; `FullScreenDialog` (Expressive, promoted in
+1.5.0-beta01, not in the pinned BOM).
 
 **Iron rules (D73, strict M3 reading)**: actions are text buttons, no filled container inside
 the dialog; aligned to the trailing edge, confirming closest to the edge, dismissive to its
@@ -279,8 +307,10 @@ Row(verticalAlignment = Alignment.CenterVertically) {
 | Input | `InputChip` | User input tokens (email recipients) |
 | Suggestion | `SuggestionChip` | Suggested responses, queries |
 
-Shape: `small` (8dp). Iron (D74): no chip row for category filter; the filter entry is an
-icon inside the search bar.
+Shape: `small` (8dp). Iron (D78): chip row under the search bar, with Category and Archived. The
+category chip opens a `DropdownMenu` with the filter options and the CRUD of the selected category
+(D82); when a category is selected the chip shows its name and a trailing X that clears the filter.
+The active-filter line of D74 is dropped, because the chip already states what is active.
 
 ```kotlin
 FilterChip(selected = active, onClick = { toggle() }, label = { Text("Strength") })
@@ -294,15 +324,47 @@ Docked (inline calendar), modal (full dialog), range. Compose: `DatePicker`,
 ### Menu
 
 Expressive menus have updated guidance (I/O 2026): more flexible, vibrant configurations.
-Compose: `DropdownMenu`, `DropdownMenuItem` (ExperimentalMaterial3Api). Shape: `small`;
-elevation level 2.
+Compose: `DropdownMenu`, `DropdownMenuItem` (ExperimentalMaterial3Api). Shape: `extra-small` (4dp) for
+the baseline menu, `large` (16dp) for the expressive vertical menu, which is the reading recommended
+for new designs; elevation level 2. Compose defaults to the baseline, so the expressive container has
+to be passed explicitly.
+
+Iron (D85): container `large` with `surfaceContainerLow`, the standard expressive vertical menu. The
+item target stays 48dp (D35), above the 44dp of the spec. D85 works in the pinned BOM because
+`DropdownMenu` accepts custom shape, color, elevation and border since 1.3.0. Expressive menu
+items (`SelectableDropdownMenuItem`, `CheckableDropdownMenuItem`) and
+`MenuDefaults.itemVibrantColors()` are promoted in 1.5.0-beta01, not in the pinned BOM.
 
 ```kotlin
-DropdownMenu(expanded = open, onDismissRequest = { close() }) {
+DropdownMenu(
+    expanded = open,
+    onDismissRequest = { close() },
+    shape = MaterialTheme.shapes.large,
+    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+) {
     DropdownMenuItem(text = { Text("Edit") }, leadingIcon = { Icon(Icons.Default.Edit, null) }, onClick = edit)
     DropdownMenuItem(text = { Text("Delete") }, leadingIcon = { Icon(Icons.Default.Delete, null) }, onClick = delete)
 }
 ```
+
+### Exposed dropdown menu
+
+A menu anchored to a field that shows the current value. Compose: `ExposedDropdownMenuBox`,
+`Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)` and
+`ExposedDropdownMenu`, all available in the pinned BOM.
+
+Use the component's `menuAnchor` modifier as the anchor, never `Modifier.clickable` on the
+field: a text field adds its own `pointerInput` for cursor placement and consumes the tap in
+the Main pass, so a `clickable` on the outside of the modifier chain never receives it.
+`menuAnchor` observes the tap in the Initial pass and applies the menu semantics, `Role.DropdownList`
+and the open action, which is what makes a read-only field operable with TalkBack (D35, D71). The
+accessible name comes from the field label; `stateDescription` is only applied by the secondary
+anchor (`SecondaryEditable`), not by the primary one.
+
+The container keeps the D85 reading, which `ExposedDropdownMenu` accepts since 1.3.0. The
+trailing icon rotates 180° when expanded; use the own Material Symbols drawable instead of
+`ExposedDropdownMenuDefaults.TrailingIcon`, because that helper depends on the removed icons
+library (D86).
 
 ### Radio button
 
@@ -311,7 +373,9 @@ Compose: `RadioButton`. Group in a container with an accessible group name
 
 ### Slider
 
-Continuous, discrete (step), range. Compose: `Slider`, `RangeSlider`. Handle shape: `full`.
+Continuous, discrete (step), range. Compose: `Slider`, `RangeSlider`; prefer the state-based
+APIs (`SliderState`, `RangeSliderState`) — the stateless overloads are deprecated in 1.5.0 in
+favor of their stateful versions. Handle shape: `full`.
 
 ```kotlin
 Slider(value = progress, onValueChange = { update(it) }, valueRange = 1f..100f, steps = 99)
@@ -327,8 +391,9 @@ Switch(checked = enabled, onCheckedChange = { toggle(it) })
 
 ### Text field
 
-Filled and outlined. Compose: `TextField` (filled), `OutlinedTextField`. Prefer
-state-based APIs (`TextFieldState`, `rememberTextFieldState()`) on current Material3
+Filled and outlined. Compose: `TextField` (filled), `OutlinedTextField`,
+`SecureTextField` / `OutlinedSecureTextField` (password fields, stable in the pinned BOM).
+Prefer state-based APIs (`TextFieldState`, `rememberTextFieldState()`) on current Material3
 releases. Shape: `small` top corners.
 
 Attributes: label, value, keyboard type, placeholder, required, disabled, error state +
@@ -369,8 +434,9 @@ Four variants:
 | Medium | 112dp | Bottom, start | Collapses to small on scroll | `MediumTopAppBar` |
 | Large | 152dp | Bottom, start | Collapses to small on scroll | `LargeTopAppBar` |
 
-Expressive variants (large flexible, search app bar) may require
-`@OptIn(ExperimentalMaterial3ExpressiveApi::class)` per BOM. Title style: `titleLarge`.
+Expressive variants (`MediumFlexibleTopAppBar`, `LargeFlexibleTopAppBar`, `TwoRowsTopAppBar`,
+`FlexibleBottomAppBar`) are promoted to stable in 1.5.0-beta01; not in the pinned BOM 1.4.0.
+Title style: `titleLarge`.
 
 ```kotlin
 TopAppBar(
@@ -384,7 +450,8 @@ TopAppBar(
 
 3–5 primary destinations, compact screens, persistent. Compose: `NavigationBar` +
 `NavigationBarItem`. Height 80dp, elevation level 2. Always show labels; filled icons for
-active state. Iron: bottom nav with four destinations (D38, compact).
+active state. Active label color: `secondary` (behavior change in material3 1.4.0, to improve
+usability, contrast and system coherence). Iron: bottom nav with four destinations (D38, compact).
 
 ```kotlin
 NavigationBar {
@@ -415,12 +482,15 @@ reference.
 ### Search
 
 Search bar (persistent field in app bar area) and search view (expandable overlay with
-suggestions). Compose: `SearchBar`, `SearchBarRow`, `SearchRow`, expressive search per BOM.
-I/O 2026: refreshed visual style, motion, flexible trailing icon behavior. Shape: `full`;
-elevation level 3.
+suggestions). Compose (stable in the pinned BOM): `SearchBar` (collapsed),
+`ExpandedDockedSearchBar` and `ExpandedFullScreenSearchBar` (expanded), `SearchBarState`.
+`SearchBarRow`/`SearchRow` are the old experimental names, superseded. I/O 2026: refreshed
+visual style, motion, flexible trailing icon behavior. Shape: `full`; elevation level 3.
 
-Iron (D74): the search box is case-insensitive in the filter bar of Exercises; the category
-filter entry is an icon inside the search bar.
+Iron (D79): the search box is case-insensitive in the search bar of Exercises. One trailing icon,
+the X, with a double function: clears the text when there is text, cancels and collapses the bar
+when the text is empty. The leading icon becomes the back arrow in the expanded search view, and
+`onSearch` only collapses the bar, because filtering is live and there is no submit.
 
 ### Tabs
 

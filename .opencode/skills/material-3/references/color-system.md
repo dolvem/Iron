@@ -106,8 +106,9 @@ MD3 generates colors from a **seed color**:
 1. A seed color is chosen
 2. The seed generates **5 tonal palettes**: Primary, Secondary, Tertiary, Neutral,
    Neutral-Variant
-3. Each palette uses tonal stops along **0–100** (commonly 16 key stops: 0, 10, 20, 25, 30,
-   35, 40, 50, 60, 70, 80, 90, 95, 98, 99, 100)
+3. Each palette uses tonal stops along **0–100**; the spec key tones are 0, 10, 20, 25, 30,
+   40, 50, 60, 70, 80, 90, 95, 99, 100. Container roles use non-key tones (e.g. 94, 96, 92,
+   90, 98, 6)
 4. Color roles are mapped to specific tonal values depending on light or dark scheme
 
 ### Tonal value mapping (light scheme)
@@ -198,6 +199,11 @@ MD3 supports 3 contrast levels:
 The contrast parameter adjusts the tonal distance between paired roles, increasing legibility
 without changing the overall color feel. On Android this is handled by the system (user
 accessibility settings); verify contrast with dynamic color active (D35).
+
+**Expressive / vibrant schemes** (promoted in 1.5.0-beta01, not in the pinned BOM):
+`materialExpressTheme` and `expressiveLightColorScheme` provide the expressive color reading;
+component defaults expose vibrant variants (`MenuDefaults.itemVibrantColors()`,
+`iconButtonVibrantColors()`).
 
 ## Baseline color scheme (default values)
 

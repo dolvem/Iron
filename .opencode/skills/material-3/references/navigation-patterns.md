@@ -15,8 +15,9 @@ bottom nav with four data destinations, Settings reached from the Today header.
 Use **`androidx.compose.material3`**: `NavigationBar`, `NavigationRail`,
 `NavigationDrawerItem`, `ModalNavigationDrawer`, `DismissibleNavigationDrawer`,
 `PermanentNavigationDrawer`, `NavigationBarItem`, `NavigationRailItem`, top app bars
-(`TopAppBar`, `CenterAlignedTopAppBar`, `MediumTopAppBar`, `LargeTopAppBar`, expressive
-variants per BOM), and **`Scaffold`** (`bottomBar`, `floatingActionButton`, `snackbarHost`).
+(`TopAppBar`, `CenterAlignedTopAppBar`, `MediumTopAppBar`, `LargeTopAppBar`; expressive
+variants promoted in 1.5.0-beta01, not in the pinned BOM), and **`Scaffold`** (`bottomBar`,
+`floatingActionButton`, `snackbarHost`).
 
 Wire destinations with **Navigation Compose** (`NavHost`, `composable`,
 `rememberNavController`). For adaptive UIs, use `calculateWindowSizeClass` and
@@ -96,6 +97,7 @@ Guidelines:
 
 - Always show labels (never icon-only)
 - Filled icons for active state, outlined for inactive
+- Active label color: `secondary` (behavior change in material3 1.4.0)
 - Do not use for fewer than 3 or more than 5 destinations
 - Hide on scroll down in content-heavy screens (optional)
 

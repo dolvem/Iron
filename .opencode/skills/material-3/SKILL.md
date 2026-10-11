@@ -1,8 +1,9 @@
 ---
 name: Material Design 3
 description: >
-  Implement Material Design 3 (MD3) in Jetpack Compose: design tokens, MaterialTheme,
-  Material3 components, theming, dynamic color, accessibility, and MD3 compliance audits.
+  Implement Material Design 3 Expressive (MD3) in Jetpack Compose: design tokens,
+  MaterialTheme, Material3 components, theming, dynamic color, accessibility, and MD3
+  compliance audits.
   Use when: "material design", "MD3", "material you", "Jetpack Compose", "MaterialTheme",
   "material component", "md3 button", "compose material3".
 ---
@@ -24,6 +25,32 @@ spring-based motion. Primary and only target: **Jetpack Compose** (`androidx.com
   watch and XR layouts are out of v1; breakpoints are kept as reference for future work.
 - `docs/spec/` is the source of truth for product decisions. This skill cites decision IDs
   (e.g. D73, D35) instead of restating rules.
+
+## BOM reality (pinned BOM 2026.09.00 → material3 1.4.0)
+
+The pinned Compose BOM resolves to `androidx.compose.material3:material3:1.4.0` (stable,
+September 2025). In 1.4.0-beta01 all APIs tagged `ExperimentalMaterial3ExpressiveApi` were
+removed; they continue in the 1.5.0-alpha series, where many have been promoted to stable in
+1.5.0-beta01 (October 2026). "Per BOM" in this skill means: check the active BOM before using
+any expressive component.
+
+Available in the pinned BOM (1.4.0):
+
+- `MaterialTheme.motionScheme` — components use it by default (`MotionScheme.standard()` /
+  `MotionScheme.expressive()`)
+- Material Symbols as the recommended icon source (see Jetpack Compose below)
+- `SearchBar`, `ExpandedDockedSearchBar`, `ExpandedFullScreenSearchBar`, `SearchBarState`
+- `TextFieldState` text fields, `SecureTextField` / `OutlinedSecureTextField`, `Text` with `autoSize`
+- `HorizontalMultiBrowseCarousel`, `HorizontalUncontainedCarousel`, `HorizontalCenteredHeroCarousel`
+- `VerticalDragHandle`, Pull to refresh, `DropdownMenu` with custom shape/color/elevation (D85)
+
+Not available in the pinned BOM (1.5.0-beta01+): `ButtonGroup`, `ToggleButton` variants,
+`SplitButton`, `FloatingActionButtonMenu` / `ToggleFloatingActionButton` (D80), expressive menu
+items (`SelectableDropdownMenuItem`, `CheckableDropdownMenuItem`), expressive list items,
+flexible app bars (`MediumFlexibleTopAppBar`, `LargeFlexibleTopAppBar`, `TwoRowsTopAppBar`,
+`FlexibleBottomAppBar`), `WavyProgressIndicator`, `LoadingIndicator`, `ScrollField`,
+`MaterialShapes` (expressive shape scale), emphasized typography, `materialExpressTheme` /
+`expressiveLightColorScheme`, `PolygonShape`.
 
 ## Philosophy
 
@@ -135,7 +162,8 @@ Elevation in MD3 is communicated through **tonal surface color**, not shadows.
 ### Motion
 
 MD3 Expressive (May 2025) introduced **spring-based motion physics** for components
-(`MotionScheme` in Compose, per BOM). The legacy easing/duration system is still used for
+(`MaterialTheme.motionScheme` in Compose — stable in the pinned BOM; `MotionScheme.standard()`
+and `MotionScheme.expressive()`). The legacy easing/duration system is still used for
 **transitions** (enter/exit/shared-axis):
 
 | Easing | Duration | Transition type |
@@ -156,19 +184,19 @@ Compose mappings and examples live in `references/component-catalog.md`.
 | Component | Compose API | Key variants | Category |
 |-----------|-------------|--------------|----------|
 | Button | `Button`, `FilledTonalButton`, `ElevatedButton`, `OutlinedButton`, `TextButton` | 5 emphasis levels; 5 sizes XS–XL (Expressive); toggle | Actions |
-| Button group | `ButtonGroup` (Expressive, per BOM) | Standard, connected | Actions |
+| Button group | `ButtonGroup` (Expressive; stable in 1.5.0-beta01, not in the pinned BOM) | Standard, connected | Actions |
 | FAB | `FloatingActionButton` | Small, Medium, Large | Actions |
 | Extended FAB | `ExtendedFloatingActionButton` | Surface, Primary, Secondary, Tertiary | Actions |
-| FAB menu | `FabMenu` (Expressive, per BOM) | — | Actions |
+| FAB menu | `FloatingActionButtonMenu` (Expressive; not in the pinned BOM, D80) | — | Actions |
 | Icon button | `IconButton`, `FilledIconButton`, `FilledTonalIconButton`, `OutlinedIconButton` | 4 variants; toggle | Actions |
 | Segmented button | `SegmentedButton` | Single-select, multi-select | Actions |
-| Split button | per BOM (Expressive) | — | Actions |
+| Split button | `SplitButton` (Expressive; stable in 1.5.0-beta01, not in the pinned BOM) | — | Actions |
 | Badge | `Badge`, `BadgedBox` | Small (dot), large (count) | Communication |
-| Progress indicator | `LinearProgressIndicator`, `CircularProgressIndicator` | Determinate/indeterminate | Communication |
+| Progress indicator | `LinearProgressIndicator`, `CircularProgressIndicator`, `WavyProgressIndicator` (stable in 1.5.0-beta01) | Determinate/indeterminate | Communication |
 | Snackbar | `Snackbar` + `SnackbarHost` | Single-line, two-line, action | Communication |
 | Tooltip | `PlainTooltip`, `RichTooltip`, `TooltipBox` | Plain, rich | Communication |
 | Card | `Card`, `OutlinedCard`, `ElevatedCard` | Filled, outlined, elevated | Containment |
-| Carousel | `HorizontalCarousel` | Multi-browse, uncontained, hero | Containment |
+| Carousel | `HorizontalMultiBrowseCarousel`, `HorizontalUncontainedCarousel`, `HorizontalCenteredHeroCarousel` | Multi-browse, uncontained, hero | Containment |
 | Dialog | `AlertDialog`, full-screen dialog | Basic, full-screen | Containment |
 | Bottom sheet | `ModalBottomSheet` | Standard, modal | Sheets |
 | Side sheet | no dedicated component | Standard, modal | Sheets |
@@ -176,17 +204,18 @@ Compose mappings and examples live in `references/component-catalog.md`.
 | Checkbox | `Checkbox` | Indeterminate state | Input |
 | Chips | `AssistChip`, `FilterChip`, `InputChip`, `SuggestionChip` | 4 variants | Input |
 | Date picker | `DatePicker`, `DatePickerDialog` | Docked, modal, range | Input |
-| Menu | `DropdownMenu`, `DropdownMenuItem` | Expressive per BOM | Input |
+| Menu | `DropdownMenu`, `DropdownMenuItem` | Expressive items (`Selectable`/`Checkable`) stable in 1.5.0-beta01; D85 works in the pinned BOM | Input |
+| Exposed dropdown | `ExposedDropdownMenuBox`, `menuAnchor`, `ExposedDropdownMenu` | Field showing the value + anchored menu; the anchor is `menuAnchor`, not `clickable` on the field | Input |
 | Radio button | `RadioButton` | — | Input |
-| Slider | `Slider`, `RangeSlider` | Continuous, discrete, range | Input |
+| Slider | `Slider`, `RangeSlider` (state-based `SliderState`/`RangeSliderState` preferred in 1.5.0) | Continuous, discrete, range | Input |
 | Switch | `Switch` | With/without icon | Input |
-| Text field | `TextField`, `OutlinedTextField` | Filled, outlined | Input |
+| Text field | `TextField`, `OutlinedTextField`, `SecureTextField` | Filled, outlined, secure | Input |
 | Time picker | `TimeInput`, `TimePicker`, `TimePickerDialog` | Docked, modal | Input |
-| App bar (top) | `TopAppBar`, `CenterAlignedTopAppBar`, `MediumTopAppBar`, `LargeTopAppBar` | 4 variants | Navigation |
+| App bar (top) | `TopAppBar`, `CenterAlignedTopAppBar`, `MediumTopAppBar`, `LargeTopAppBar` | 4 variants; flexible variants stable in 1.5.0-beta01 | Navigation |
 | Navigation bar | `NavigationBar`, `NavigationBarItem` | — | Navigation |
 | Navigation drawer | `ModalNavigationDrawer`, `PermanentNavigationDrawer`, `DismissibleNavigationDrawer` | Standard, modal | Navigation |
 | Navigation rail | `NavigationRail`, `NavigationRailItem` | — | Navigation |
-| Search | `SearchBar`, `SearchRow`, expressive search per BOM | Search bar, search view | Navigation |
+| Search | `SearchBar`, `ExpandedDockedSearchBar`, `ExpandedFullScreenSearchBar`, `SearchBarState` | Search bar, search view | Navigation |
 | Tabs | `PrimaryTabRow`, `SecondaryTabRow`, `Tab` | Primary, secondary | Navigation |
 | Toolbar | no dedicated component | — | Navigation |
 | List | `ListItem` + `LazyColumn` | One-line, two-line, three-line | Data display |
@@ -207,7 +236,15 @@ Use **`androidx.compose.material3`** with `MaterialTheme` and Material 3 composa
   `WindowInsets` (`Modifier.statusBarsPadding()`, `navigationBarsPadding()`, `imePadding()`,
   `displayCutoutPadding()`) and `Scaffold` `contentWindowInsets` so bars and IME behave correctly.
 - **Experimental APIs**: some Material 3 APIs require `@OptIn(ExperimentalMaterial3Api::class)`
-  or `@OptIn(ExperimentalMaterial3ExpressiveApi::class)`; match your BOM and compiler.
+  or `@OptIn(ExperimentalMaterial3ExpressiveApi::class)`; match your BOM and compiler. In
+  1.5.0-beta01+, the `Material3ExpressiveApi` annotation no longer requires `@OptIn`.
+- **Icons**: use **Material Symbols** — download vector drawables from the Android tab of
+  https://fonts.google.com/icons. `androidx.compose.material.icons` is no longer recommended:
+  it was removed from the material3 1.4.0 release, stopped receiving updates, and increases
+  build time.
+- **State-based APIs**: prefer `TextFieldState`, `SliderState`, `RangeSliderState`,
+  `SearchBarState`, `CarouselState` over stateless value-based overloads; the stateless
+  `Slider`/`RangeSlider` variants are deprecated in 1.5.0 in favor of their stateful versions.
 - **Lists**: `LazyColumn` with `key` on every item (project rule).
 
 ```kotlin
@@ -275,10 +312,10 @@ analyze the target source tree and produce a compliance report.
 | **Typography** | `MaterialTheme.typography` scale; correct roles (Display, Headline, Title, Body, Label) |
 | **Shape** | `MaterialTheme.shapes` / component `Shape`; buttons full, cards medium; no magic numbers |
 | **Elevation** | Tonal elevation (`Surface` tonal levels); shadows only where justified |
-| **Components** | Material3 composables (`Button`, `Scaffold`, `NavigationBar`, etc.); correct variants |
+| **Components** | Material3 composables (`Button`, `Scaffold`, `NavigationBar`, etc.); correct variants; Material Symbols icons, not the deprecated `Icons.Default` library; APIs available in the pinned BOM |
 | **Layout** | 8dp spacing system; readable max width; margins/gutters per size class (compact in v1) |
 | **Navigation** | Bottom bar for compact (Iron, D38); predictive back accepted by default (target API 36) |
-| **Motion** | `MotionScheme` / expressive APIs when used; transitions may still use easing/duration |
+| **Motion** | `MaterialTheme.motionScheme` / expressive APIs when used; transitions may still use easing/duration; check availability against the pinned BOM |
 | **Accessibility** | Contrast with dynamic color (4.5:1 text, 3:1 UI); 48dp targets; `contentDescription`; font scale; textual alternative for charts (D35); `mergeDescendants` (D71) |
 | **Theming** | `MaterialTheme` + light/dark/dynamic as designed |
 
@@ -332,6 +369,12 @@ grep -rn 'Icon(' --include='*.kt' app/src/main | grep -v 'contentDescription'
 
 # Missing key in LazyColumn items
 grep -rn 'items(' --include='*.kt' app/src/main | grep -v 'key ='
+
+# Icons from the deprecated material-icons library (migrate to Material Symbols)
+grep -rn 'Icons\.' --include='*.kt' app/src/main
+
+# Expressive APIs not available in the pinned BOM (material3 1.4.0)
+grep -rn 'ExperimentalMaterial3ExpressiveApi' --include='*.kt' app/src/main
 ```
 
 ### Scoring guide

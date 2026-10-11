@@ -48,8 +48,10 @@ adjustments. Use for:
 - Unread/important content
 
 To use: swap the baseline style for the emphasized version (e.g.
-`md.sys.typescale.display-large` → `md.sys.typescale.emphasized.display-large`; in Compose,
-per BOM, expressive typography is exposed through the expressive type schemes).
+`md.sys.typescale.display-large` → `md.sys.typescale.emphasized.display-large`). In Compose,
+the default `Typography()` in the pinned BOM (1.4.0) exposes only the 15 baseline styles; the
+emphasized scales arrive with the `Typography` constructor overload in 1.5.0. Until then,
+emulate emphasis with a higher `fontWeight` on the baseline style.
 
 ### Typeface customization
 
@@ -105,8 +107,11 @@ font sizes outside the type scale, and verify layouts do not clip at large font 
 | `extra-extra-large` | 48 | (Expressive) |
 | `full` | pill | Buttons, badges, pills, sliders |
 
-In Compose, use `MaterialTheme.shapes.small` / `.medium` / `.large` or the expressive shape
-scheme per BOM. Do not hardcode `RoundedCornerShape(12.dp)` for token-mapped components.
+In Compose, use `MaterialTheme.shapes.small` / `.medium` / `.large`. In the pinned BOM (1.4.0),
+`Shapes` exposes only 5 tokens (extraSmall–extraLarge); the increased tokens and `full` are
+spec tokens, in Compose available via `MaterialShapes` / `PolygonShape` in 1.5.0. Pill shapes
+are reached with `CircleShape`. Do not hardcode `RoundedCornerShape(12.dp)` for token-mapped
+components.
 
 ### Component shape mapping
 
@@ -120,7 +125,7 @@ scheme per BOM. Do not hardcode `RoundedCornerShape(12.dp)` for token-mapped com
 | Cards | `medium` |
 | Dialogs | `extra-large` |
 | Text fields | `small` (top corners) |
-| Menus | `small` |
+| Menus | `extra-small` (baseline); `large` for the expressive vertical menu |
 | Navigation drawer | `large` (end corners) |
 | Bottom sheets | `extra-large` (top corners) |
 | Snackbars | `extra-small` |
@@ -135,7 +140,8 @@ scheme per BOM. Do not hardcode `RoundedCornerShape(12.dp)` for token-mapped com
 In the M3 Expressive update, components can morph between shapes on interaction: button
 shapes morph when pressed, selected states can change shape, loading indicators use shape
 morphing to show progress. Jetpack Compose is where Google documents expressive
-shape/motion behavior for Android (per BOM, `ExperimentalMaterial3ExpressiveApi`).
+shape/motion behavior for Android (`ExperimentalMaterial3ExpressiveApi` in 1.5.0+; shape
+morphing is not in the pinned BOM 1.4.0).
 
 ## Elevation
 
@@ -190,8 +196,9 @@ Springs create more natural, responsive motion:
 
 - Springs have no fixed duration — they respond dynamically to input
 - Two schemes: **standard** (utilitarian) and **expressive** (bouncy)
-- Jetpack Compose exposes motion schemes / spring-oriented APIs in current Material3
-  (`MotionScheme`, per BOM)
+- In Compose, components use the motion scheme by default; read it with
+  `MaterialTheme.motionScheme` (`MotionScheme.standard()` / `MotionScheme.expressive()`),
+  stable in the pinned BOM. `LocalMotionScheme` was removed in 1.5.0-beta01
 
 ### Easing and duration (transitions)
 
