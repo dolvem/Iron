@@ -3,7 +3,7 @@
 
 # Reglas de negocio y definiciones de cálculo
 
-Parte de `docs/README.md`. El esquema está en `docs/spec/data.md` y el estado de cada decisión (D1–D72) en `docs/state/decisions.md`.
+Parte de `docs/README.md`. El esquema está en `docs/spec/data.md` y el estado de cada decisión (D1–D82) en `docs/state/decisions.md`.
 
 Estas reglas son las que convierten el esquema en comportamiento. Se cerraron antes de escribir los DAOs, porque cambiarlas después obliga a migraciones.
 
@@ -95,5 +95,5 @@ RPE (Rate of Perceived Exertion) es la escala 1–10 que indica qué tan cerca e
 - **Ejercicios:** por `nameKey` (D68), no por `name`, porque la colación BINARY de SQLite no es case-insensitive con acentos y el orden no coincidiría con la unicidad de D4. Historial: fecha descendente. Planes: por `sequence`.
 - Historial agrupado por sesión, cargado de 30 sesiones por página. El agrupamiento usa `Workout.sessionDate`.
 - Filtros del historial: ejercicio, plan, categoría, rango de fechas y sesiones libres.
-- `archived` y `enabled = false` quedan excluidos por defecto, con filtro para mostrarlos.
-- Búsqueda case-insensitive en la lista de ejercicios, en la barra de filtros.
+- `archived` y `enabled = false` quedan excluidos por defecto, con filtro para mostrarlos. En Ejercicios el filtro de archivado es excluyente: activado muestra solo archivados (D81). En el resto de listados el filtro sigue siendo inclusivo, porque ahí sí tiene sentido ver archivados y activos juntos.
+- Búsqueda case-insensitive en la lista de ejercicios, en la search bar.

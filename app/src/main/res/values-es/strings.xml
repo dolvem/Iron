@@ -18,14 +18,25 @@
     <string name="settings_empty">Los ajustes estarán disponibles en una iteración posterior.</string>
 
     <!-- Iteración 3: barra de filtros de Ejercicios (D31). -->
-    <string name="exercises_search_label">Buscar</string>
-    <string name="exercises_filter_category">Categoría</string>
-    <string name="exercises_filter_all_categories">Todas las categorías</string>
-    <string name="exercises_filter_show_archived">Mostrar archivados</string>
+    <!-- Iteración 4.5 (D78, D79): la fila de chips bajo la search bar es el acceso al filtro, y el trailing
+    icon de la barra es la X con doble función. -->
+    <string name="exercises_search_label">Buscar ejercicios</string>
     <string name="exercises_no_results">No hay resultados con este filtro.</string>
     <string name="exercises_archived">Archivado</string>
     <string name="exercises_row_actions">Acciones de %s</string>
-    <string name="exercises_create_action">Crear ejercicio</string>
+    <string name="search_clear_action">Limpiar búsqueda</string>
+    <string name="search_back_action">Atrás</string>
+    <string name="filter_chip_category">Categoría</string>
+    <string name="filter_chip_archived">Archivado</string>
+    <string name="filter_clear_action">Quitar filtro</string>
+    <!-- D35: el nombre accesible del chip incluye el estado, porque el check de M3 es solo visual. -->
+    <string name="filter_chip_name">%1$s, %2$s</string>
+    <string name="filter_chip_state_selected">seleccionado</string>
+    <string name="filter_chip_state_unselected">no seleccionado</string>
+    <!-- D80: el FAB menu agrupa las dos creaciones de la pantalla. -->
+    <string name="fab_menu_label">Crear</string>
+    <string name="fab_menu_create_exercise">Crear ejercicio</string>
+    <string name="fab_menu_create_category">Crear categoría</string>
 
     <!-- Iteración 3: CRUD de ejercicios. -->
     <string name="exercise_create_title">Nuevo ejercicio</string>
@@ -36,12 +47,12 @@
     <string name="exercise_category_label">Categoría</string>
     <string name="exercise_merge_hint">Elige el destino. Su nombre sobrevive.</string>
     <!-- Asignación de categoría: el diálogo de creación tiene su propio selector, y la fila tiene la
-    acción de mover. La UI no hereda la categoría del filtro activo. -->
+    acción de mover. D76: el selector de la creación hereda la categoría del filtro activo como valor
+    por defecto. -->
     <string name="action_move_to_category">Mover a categoría</string>
 
-    <!-- Iteración 3: CRUD de categorías. -->
-    <string name="categories_title">Categorías</string>
-    <string name="categories_empty">Todavía no hay categorías.</string>
+    <!-- Iteración 3: CRUD de categorías. D74: el título del sheet es "Filtros", y el sheet ya no tiene
+    estado vacío propio. -->
     <string name="category_create_title">Nueva categoría</string>
     <string name="category_rename_title">Renombrar categoría</string>
     <string name="category_delete_title">Borrar categoría</string>

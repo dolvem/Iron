@@ -5,7 +5,7 @@
 
 Rediseño de la navegación desde cero. Sustituye la estructura de pestañas heredada de Flexify.
 
-Parte de `docs/README.md`. El comportamiento de las pantallas está en `docs/spec/ux.md`, las reglas de negocio en `docs/spec/rules.md`, y el estado de las decisiones (D1–D72) en `docs/state/decisions.md`. Este documento solo tiene estructura: destinos, grafo y pantallas.
+Parte de `docs/README.md`. El comportamiento de las pantallas está en `docs/spec/ux.md`, las reglas de negocio en `docs/spec/rules.md`, y el estado de las decisiones (D1–D76) en `docs/state/decisions.md`. Este documento solo tiene estructura: destinos, grafo y pantallas.
 
 ## Destinos
 
@@ -29,7 +29,7 @@ nav
 ├── planes
 │     └── plan/:id  ──[Abrir sesión]──▶ session/:id
 ├── ejercicios
-│     ├── filtro por categoría (sheet, no ruta)
+│     ├── filtro por categoría (chip con menú, no ruta)
 │     └── ejercicio/:id
 ├── historial
 │     ├── sesión/:id
@@ -68,9 +68,15 @@ No permite editar la plantilla mientras hay una sesión abierta: eso mutaría la
 
 La lista está optimizada para **filtrar y acceder**, no para gestionar. El CRUD es relevante en el setup inicial y luego casi nunca.
 
-El detalle contiene: identidad (nombre, categoría, notas), gráficas, últimos registros, estadísticas (PR, valor actual, volumen semanal), y el CRUD, que llega por el menú de acciones de la identidad: renombrar, borrar y archivar. Las categorías se gestionan desde la barra de filtros de la lista, no como vista propia.
+El detalle contiene: identidad (nombre, categoría, notas), gráficas, últimos registros, estadísticas (PR, valor actual, volumen semanal), y el CRUD, que llega por el menú de acciones de la identidad: renombrar, borrar y archivar. Las categorías se gestionan desde el menú del chip de categoría de la lista (D82), no como vista propia.
 
 El CRUD se escribe primero en las filas de la lista, que es donde se usa en el setup inicial. El menú de acciones de la identidad llega en la iteración 11, así que el detalle es solo lectura hasta entonces (D69).
+
+**Fila de lista (D75, cerrada):** el nombre es el texto dominante y la categoría se muestra como píldora debajo. La píldora se oculta cuando esa categoría es el filtro activo, porque el chip de categoría de D78 ya lo enuncia. El badge Archivado convive en la misma línea de pills.
+
+**Píldora de sin categoría (D83, cerrada):** la píldora se lee como badge, que es lo que justifica el shape `full`. Las pills de categoría y el badge Archivado usan la pareja `secondary_container` + `on_secondary_container` (D75); la de sin categoría usa la pareja neutra `surface_container` + `on_surface_variant`, la lectura M3 de un badge de baja énfasis, para diferenciarla.
+
+**Crear en la lista (D80, cerrada):** el acceso a crear es un FAB menu con dos items, Crear ejercicio y Crear categoría, que revisa D77. El FAB sigue siendo el contenedor estándar de la acción principal en M3, y el menú agrupa las dos acciones emparentadas de la pantalla. La creación de categoría deja de ser un item del sheet, que desaparece con D78.
 
 ### Historial
 

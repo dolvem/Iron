@@ -63,19 +63,26 @@ class ExerciseSearchTest {
         assertEquals("Sentadilla búlgara", found.first().name)
     }
 
-    // Reglas de orden: archived excluido por defecto, con la variante para el filtro que lo muestra.
+    // Reglas de orden y D81: archived queda excluido por defecto, y el filtro es excluyente, así que
+    // activado muestra solo archivados. No hay un estado "todos incluidos", y por eso con el filtro
+    // activado el ejercicio activo no aparece.
     @Test
-    fun archivedIsExcludedByDefaultAndIncludedWithTheFilter() = runBlocking {
-        val exercise = (repo.createExercise("Sentadilla", null) as Outcome.Ok<Exercise>).value
-        repo.setArchived(exercise, true)
+    fun archivedFilterIsExclusive() = runBlocking {
+        (repo.createExercise("Sentadilla", null) as Outcome.Ok<Exercise>).value
+        val archived = (repo.createExercise("Peso muerto", null) as Outcome.Ok<Exercise>).value
+        repo.setArchived(archived, true)
 
-        assertEquals(0, repo.search("", null, false).first().size)
-        assertEquals(1, repo.search("", null, true).first().size)
+        val hidden = repo.search("", null, false).first()
+        assertEquals(listOf("Sentadilla"), hidden.map { it.name })
+
+        val onlyArchived = repo.search("", null, true).first()
+        assertEquals(listOf("Peso muerto"), onlyArchived.map { it.name })
     }
 
-    // D32: los candidatos de fusión se leen con la variante de la búsqueda que muestra archived, porque
-    // si el destino archivado no fuera alcanzable la regla del menos restrictivo no se aplicaría nunca.
-    // Se lee con query vacía: el filtro de la lista no limita el destino que el usuario elige.
+    // D32: los candidatos de fusión se leen con la lectura que ignora el filtro de archivado, porque si
+    // el destino archivado no fuera alcanzable la regla del menos restrictivo no se aplicaría nunca. Se
+    // lee con query vacía: el filtro de la lista no limita el destino que el usuario elige. Con D81 la
+    // búsqueda de la pantalla es excluyente, así que esta lectura es aparte.
     @Test
     fun mergeCandidatesIgnoreTheQueryAndIncludeArchived() = runBlocking {
         repo.createExercise("Sentadilla", null)
@@ -83,7 +90,7 @@ class ExerciseSearchTest {
         repo.setArchived(archived, true)
 
         assertEquals(1, repo.search("sentadilla", null, false).first().size)
-        assertEquals(2, repo.search("", null, true).first().size)
+        assertEquals(2, repo.searchIncludingArchived("", null).first().size)
     }
 
     // Reglas de orden: los ejercicios por nombre, que es nameKey. Con la colación BINARY de SQLite,

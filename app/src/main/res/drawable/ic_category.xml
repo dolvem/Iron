@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 dolvem -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Leading icon del item de mover a categoría en el menú de fila (D86). Path de Material Symbols, como
+  los iconos del rediseño de vistas. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M6.5,11 12,2 17.5,11H6.5ZM17.5,22Q15.625,22T13,17.5Q13,15.625T17.5,13Q19.375,13T22,17.5Q22,19.375T17.5,22ZM3,21.5V13.5H11V21.5H3Z" />
+</vector>

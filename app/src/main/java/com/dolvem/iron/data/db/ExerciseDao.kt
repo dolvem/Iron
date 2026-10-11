@@ -44,19 +44,31 @@ interface ExerciseDao {
     fun observeByNameKey(nameKey: String): Flow<Exercise?>
 
     // D31: la búsqueda es case-insensitive sobre nameKey, la columna normalizada de D4, porque LIKE en
-    // SQLite solo pliega ASCII. El patrón llega ya normalizado desde el repositorio. archived queda
-    // excluido por defecto con la variante que lo muestra (reglas de orden), y el filtro de categoría
-    // admite null, que es "todas las categorías". Devuelve la lista completa porque la pantalla pinta
-    // todos los resultados, a diferencia de las lecturas por fila de la iteración 2. El orden es por
-    // nameKey, la misma columna de D4, por la colación BINARY de SQLite.
+    // SQLite solo pliega ASCII. El patrón llega ya normalizado desde el repositorio. D81: el filtro de
+    // archivado es excluyente, así que archived queda excluido por defecto y con el filtro activado se
+    // ven solo los archivados, no todos incluidos. El filtro de categoría admite null, que es "todas las
+    // categorías". Devuelve la lista completa porque la pantalla pinta todos los resultados, a diferencia
+    // de las lecturas por fila de la iteración 2. El orden es por nameKey, la misma columna de D4, por la
+    // colación BINARY de SQLite.
     @Query(
         "SELECT * FROM Exercise " +
             "WHERE nameKey LIKE :pattern " +
             "AND (:categoryId IS NULL OR categoryId = :categoryId) " +
-            "AND (:showArchived OR archived = 0) " +
+            "AND archived = CASE WHEN :onlyArchived THEN 1 ELSE 0 END " +
             "ORDER BY nameKey"
     )
-    fun search(pattern: String, categoryId: Int?, showArchived: Boolean): Flow<List<Exercise>>
+    fun search(pattern: String, categoryId: Int?, onlyArchived: Boolean): Flow<List<Exercise>>
+
+    // D32: los candidatos de fusión se leen sin el filtro de archivado, porque si el destino archivado no
+    // fuera alcanzable la regla del menos restrictivo en archived no se aplicaría nunca. Con D81 la
+    // búsqueda de la pantalla es excluyente, así que esta lectura es aparte.
+    @Query(
+        "SELECT * FROM Exercise " +
+            "WHERE nameKey LIKE :pattern " +
+            "AND (:categoryId IS NULL OR categoryId = :categoryId) " +
+            "ORDER BY nameKey"
+    )
+    fun searchIncludingArchived(pattern: String, categoryId: Int?): Flow<List<Exercise>>
 
     // D5: la preconsulta de conteo es un método separado del borrado, y es lo que permite la
     // confirmación con conteo de afectados. Se cuenta antes del CASCADE.

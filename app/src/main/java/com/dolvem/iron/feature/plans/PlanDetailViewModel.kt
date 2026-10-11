@@ -75,7 +75,9 @@ class PlanDetailViewModel(private val container: AppContainer, private val planI
                 container.planRepo.observeExercises(planId)
             }
         },
-        container.exerciseRepo.search("", null, true)
+        // D81: con el filtro de archivado excluyente, search(…, true) devuelve solo los archivados, así que
+        // la lectura de candidatos es la variante sin filtro de archivado (D32).
+        container.exerciseRepo.searchIncludingArchived("", null)
     ) { show, rows, exercises ->
         PlanRowsState(
             show,

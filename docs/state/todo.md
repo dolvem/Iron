@@ -14,6 +14,7 @@ El estado y las notas de cada bloque viven en su fichero de `docs/iterations/`; 
 | 2 | Capa de datos | cerrada | `iterations/02-capa-de-datos.md` |
 | 3 | Ejercicios | cerrada | `iterations/03-ejercicios.md` |
 | 4 | Planes | cerrada | `iterations/04-planes.md` |
+| 4.5 | Rediseño de vistas (Ejercicios) | en curso | `iterations/04.5-rediseño-de-vistas.md` |
 | 5 | Sesión | pendiente | `iterations/05-sesion.md` |
 | 6 | Hoy | pendiente | `iterations/06-hoy.md` |
 | 7 | Historial | pendiente | `iterations/07-historial.md` |

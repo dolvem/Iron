@@ -36,7 +36,7 @@ class ExerciseRepo(
 ) {
 
     // D5: las lecturas devuelven Flow directo, sin Outcome. Los ejercicios por nombre (reglas de orden),
-    // archived excluido por defecto con la variante para el filtro que lo muestra.
+    // archived excluido por defecto, con el filtro excluyente de D81.
     fun observeAll(): Flow<Exercise> = dao.observeAll()
 
     fun observeAllIncludingArchived(): Flow<Exercise> = dao.observeAllIncludingArchived()
@@ -48,9 +48,15 @@ class ExerciseRepo(
     fun observeByNameKey(nameKey: String): Flow<Exercise?> = dao.observeByNameKey(nameKey)
 
     // D31: la búsqueda es case-insensitive sobre nameKey. El patrón se normaliza aquí con la única
-    // función de D4, porque SQLite no puede normalizar acentos; el DAO solo recibe el LIKE.
-    fun search(query: String, categoryId: Int?, showArchived: Boolean): Flow<List<Exercise>> =
-        dao.search("%${nameKey(query)}%", categoryId, showArchived)
+    // función de D4, porque SQLite no puede normalizar acentos; el DAO solo recibe el LIKE. D81: el
+    // flag es excluyente, con false archived queda excluido y con true se ven solo los archivados.
+    fun search(query: String, categoryId: Int?, onlyArchived: Boolean): Flow<List<Exercise>> =
+        dao.search("%${nameKey(query)}%", categoryId, onlyArchived)
+
+    // D32: la lectura de los candidatos de fusión ignora el filtro de archivado, porque el destino
+    // archivado tiene que ser alcanzable.
+    fun searchIncludingArchived(query: String, categoryId: Int?): Flow<List<Exercise>> =
+        dao.searchIncludingArchived("%${nameKey(query)}%", categoryId)
 
     suspend fun createExercise(name: String, categoryId: Int?): Outcome<Exercise> {
         val exercise = Exercise(id = 0, name = name, nameKey = nameKey(name), categoryId = categoryId)

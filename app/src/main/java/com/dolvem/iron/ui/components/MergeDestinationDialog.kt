@@ -5,6 +5,7 @@ package com.dolvem.iron.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import com.dolvem.iron.R
 
 // D32: el usuario elige el destino de la fusión y sobrevive su nombre. Aquí solo se hace la elección;
 // el conteo de afectados lo muestra la confirmación de D40.
+// D73: título `headlineSmall` y text buttons.
 @Composable
 fun <T> MergeDestinationDialog(
     title: String,
@@ -24,10 +26,10 @@ fun <T> MergeDestinationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
+        title = { Text(title, style = MaterialTheme.typography.headlineSmall) },
         text = {
             Column {
-                Text(hint)
+                Text(hint, style = MaterialTheme.typography.bodyMedium)
                 candidates.forEach { candidate ->
                     TextButton(onClick = { onSelect(candidate) }) { Text(label(candidate)) }
                 }

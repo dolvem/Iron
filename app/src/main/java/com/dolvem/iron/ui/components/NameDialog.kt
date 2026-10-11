@@ -4,6 +4,7 @@
 package com.dolvem.iron.ui.components
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -17,6 +18,8 @@ import com.dolvem.iron.R
 
 // Formulario de nombre compartido por el CRUD de ejercicios y categorías. El estado local de pantalla
 // usa rememberSaveable, como fija la UX operativa.
+// D73: título `headlineSmall` y text buttons. Tipografías de la skill: input `bodyLarge` y label
+// flotante `bodySmall`.
 @Composable
 fun NameDialog(
     title: String,
@@ -30,12 +33,13 @@ fun NameDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title) },
+        title = { Text(title, style = MaterialTheme.typography.headlineSmall) },
         text = {
             OutlinedTextField(
                 value = value,
                 onValueChange = { value = it },
-                label = { Text(label) },
+                label = { Text(label, style = MaterialTheme.typography.bodySmall) },
+                textStyle = MaterialTheme.typography.bodyLarge,
                 singleLine = true
             )
         },

@@ -19,12 +19,27 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-// Estado de pantalla: el filtro de la barra (D31) y lo que emite el repositorio. La UI no valida, el
+// D78: el filtro de categoría es una elección única en el menú del chip: todas, una categoría o sin
+// categoría. El menú muestra los conteos por grupo, así que la elección se modela aparte del conteo.
+sealed interface CategoryFilter {
+    data object All : CategoryFilter
+    data class ById(val id: Int) : CategoryFilter
+    data object None : CategoryFilter
+}
+
+// Estado de pantalla: el filtro de la search bar (D31) y lo que emite el repositorio. La UI no valida, el
 // error siempre viene del repositorio (D6), así que aquí no hay validación de nombres.
-data class ExercisesFilter(val query: String = "", val categoryId: Int? = null, val showArchived: Boolean = false)
+// D81: el filtro de archivado es excluyente, con false archived queda excluido y con true se ven solo los
+// archivados. No hay un estado "todos incluidos", así que un booleano basta.
+data class ExercisesFilter(
+    val query: String = "",
+    val category: CategoryFilter = CategoryFilter.All,
+    val onlyArchived: Boolean = false
+)
 
 data class ExercisesState(
     val filter: ExercisesFilter = ExercisesFilter(),
@@ -32,8 +47,16 @@ data class ExercisesState(
     val exercises: List<Exercise> = emptyList(),
     // D32: los candidatos de fusión no siguen el filtro de la lista. Si el destino archivado no fuera
     // alcanzable, la regla del menos restrictivo en archived no se podría aplicar nunca.
-    val mergeCandidates: List<Exercise> = emptyList()
+    val mergeCandidates: List<Exercise> = emptyList(),
+    // D78: los conteos por categoría del menú del chip, con la clave null para "sin categoría". Se
+    // calculan sobre la lista completa con el estado de archivado aplicado, porque el menú muestra todos
+    // los grupos, no solo la categoría activa.
+    val categoryCounts: Map<Int?, Int> = emptyMap()
 )
+
+// Función pura del conteo por grupo, separada para poder testearla (iteración 4.5).
+internal fun categoryCounts(exercises: List<Exercise>): Map<Int?, Int> =
+    exercises.groupingBy { it.categoryId }.eachCount()
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExercisesViewModel(private val container: AppContainer) : ViewModel() {
@@ -44,17 +67,25 @@ class ExercisesViewModel(private val container: AppContainer) : ViewModel() {
     // la búsqueda sobre nameKey se recalcula con la normalización de D4 en cada cambio.
     val state: StateFlow<ExercisesState> = combine(
         filter,
-        filter.flatMapLatest { f -> container.exerciseRepo.search(f.query, f.categoryId, f.showArchived) },
+        filter.flatMapLatest { f ->
+            val categoryId = if (f.category is CategoryFilter.ById) f.category.id else null
+            val flow = container.exerciseRepo.search(f.query, categoryId, f.onlyArchived)
+            // D78: "sin categoría" es un grupo, no un null de la consulta, así que se resuelve aquí,
+            // en la capa de presentación, sin tocar el DAO.
+            if (f.category == CategoryFilter.None) flow.map { list -> list.filter { it.categoryId == null } } else flow
+        },
         container.categoryRepo.observeAll(),
         // D32: los candidatos de fusión no siguen el filtro de la lista. Si el destino archivado no
-        // fuera alcanzable, la regla del menos restrictivo en archived no se podría aplicar nunca.
-        container.exerciseRepo.search("", null, true)
-    ) { f, exercises, categories, candidates ->
-        ExercisesState(f, categories, exercises, candidates)
+        // fuera alcanzable, la regla del menos restrictivo en archived no se podría aplicar nunca. Con
+        // D81 la búsqueda de la pantalla es excluyente, así que esta lectura es aparte.
+        container.exerciseRepo.searchIncludingArchived("", null),
+        filter.flatMapLatest { f -> container.exerciseRepo.search("", null, f.onlyArchived).map { categoryCounts(it) } }
+    ) { f, exercises, categories, candidates, counts ->
+        ExercisesState(f, categories, exercises, candidates, counts)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ExercisesState())
 
-    fun setFilter(query: String, categoryId: Int?, showArchived: Boolean) {
-        filter.update { it.copy(query = query, categoryId = categoryId, showArchived = showArchived) }
+    fun setFilter(query: String, category: CategoryFilter, onlyArchived: Boolean) {
+        filter.update { it.copy(query = query, category = category, onlyArchived = onlyArchived) }
     }
 
     // CRUD de ejercicios. Las operaciones con error de negocio esperado devuelven Outcome (D5); el
@@ -87,7 +118,7 @@ class ExercisesViewModel(private val container: AppContainer) : ViewModel() {
     suspend fun affectedPlanExercises(exercise: Exercise): Int =
         container.exerciseRepo.affectedPlanExercises(exercise.id)
 
-    // CRUD de categorías, gestionadas desde la barra de filtros como sheet, no como ruta.
+    // D82: el CRUD de categorías se accede desde el menú del chip de categoría, no como ruta.
     suspend fun createCategory(name: String): Outcome<Category> = container.categoryRepo.createCategory(name)
 
     suspend fun renameCategory(category: Category, name: String): Outcome<Category> =

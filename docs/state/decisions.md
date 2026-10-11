@@ -3,7 +3,7 @@
 
 # Decisiones: estado tras la séptima revisión del 08/10/2026 y las decisiones de implementación
 
-Parte de `docs/README.md`. Los números D1–D72 son la referencia cruzada entre documentos. Los D1–D46 no cambian; D47–D61 se añaden al cerrar el bloque de build y distribución, D62 en la cuarta revisión, D63 y D64 en la séptima revisión, D65 y D66 al escribir la iteración 1, y D67 a D72 durante la implementación de las iteraciones 3 y 4. Este documento es el único que narra las revisiones; los demás enlazan aquí y no repiten qué se cerró en cada una.
+Parte de `docs/README.md`. Los números D1–D85 son la referencia cruzada entre documentos. Los D1–D46 no cambian; D47–D61 se añaden al cerrar el bloque de build y distribución, D62 en la cuarta revisión, D63 y D64 en la séptima revisión, D65 y D66 al escribir la iteración 1, D67 a D72 durante la implementación de las iteraciones 3 y 4, D73 a D76 en el rediseño de vistas de Penpot, D77 al implementar la iteración 4.5, D78 a D82 al rediseñar el filtrado de Ejercicios sobre el spec de M3, que revisan D74 y D77, D83 al cerrar la píldora de sin categoría, que revisa D75, D84 al descartar el item "Todas" del menú del chip, que revisa D78, D85 al cerrar el contenedor de los menús y D86 al cerrar el leading icon de los items de acción. Este documento es el único que narra las revisiones; los demás enlazan aquí y no repiten qué se cerró en cada una.
 
 Aquí solo se guarda el estado y la justificación de cada decisión. La regla está en el documento de su ámbito, que se indica en la columna "Ámbito". La columna "Bloquea" referencia las iteraciones de `docs/state/todo.md`. Las decisiones de detalle que no condicionan iteraciones posteriores no reciben ID: se quedan como nota en `docs/iterations/`.
 
@@ -85,6 +85,20 @@ Las cerradas se aplican como está escrito en el documento de su ámbito. El blo
 | D70 | Error de `Outcome` en un sheet | **Cerrada:** se muestra dentro del sheet, porque el sheet tapa el `SnackbarHost` de la pantalla | 5 | ux |
 | D71 | Nombre accesible de los selectores | **Cerrada:** `semantics(mergeDescendants = true)` en las filas clicables, para que el control tenga nombre propio | 11 | ux |
 | D72 | Recursos y locale en Compose | **Cerrada:** `LocalResources` y `LocalLocale.current.platformLocale`, no `LocalContext` ni `Locale.getDefault()` | 10 | engineering |
+| D73 | Diálogos según M3 estricto | **Cerrada:** actions como text buttons alineados al borde trailing, 24dp entre contenido y actions, 8dp entre botones, altura 36dp, label `primary` o `error` | 4.5 a 11 | ux |
+| D74 | Filtro de categoría en Ejercicios | **Revisada por D78:** se descarta la línea de filtro activo y el icono de filtro dentro de la search bar | 4.5 y 7 | ux |
+| D75 | Fila de lista en Ejercicios | **Cerrada:** nombre dominante, píldora de categoría debajo, oculta con esa categoría filtrada, badge Archivado en la misma línea | 4.5 y 7 | views |
+| D76 | Categoría por defecto en la creación | **Cerrada:** dropdown outlined, solo estado cerrado, valor por defecto = categoría del filtro activo | 4.5 | ux |
+| D77 | Crear en Ejercicios como FAB | **Revisada por D80:** el FAB pasa a FAB menu con dos items | 4.5 | views |
+| D78 | Fila de chips en Ejercicios | **Cerrada:** dos chips bajo la search bar, Categoría y Archivado; el de categoría abre un menú con las opciones de filtrado y el CRUD de la categoría seleccionada | 4.5 y 7 | ux |
+| D79 | Trailing icon de la search bar | **Cerrada:** un solo icono X con doble función: borra el texto con contenido, cancela y colapsa con texto vacío | 4.5 y 7 | ux |
+| D80 | Crear en Ejercicios como FAB menu | **Cerrada:** FAB menu con Crear ejercicio y Crear categoría; en código `DropdownMenu` anclado sobre el FAB, porque el componente Expressive no está en el BOM fijado | 4.5 | views |
+| D81 | Filtro de archivado excluyente | **Cerrada:** dos estados, ocultos por defecto y solo archivados; no hay estado "todos incluidos" | 4.5 y 7 | rules |
+| D82 | CRUD de categorías | **Cerrada:** en el menú del chip de categoría, solo para la categoría seleccionada | 4.5 | views |
+| D83 | Píldora de sin categoría | **Cerrada:** pareja neutra `surface_container` + `on_surface_variant`, que revisa D75 para ese caso | 4.5 y 7 | views |
+| D84 | Menú del chip de categoría | **Cerrada:** sin el item "Todas", porque el chip es el filtro y no una opción de filtrado; limpiar es la X, con un item de menú que mantiene la acción alcanzable. Revisa D78 | 4.5 | ux |
+| D85 | Contenedor de los menús | **Cerrada:** shape `large` (16dp) con `surfaceContainerLow`, la lectura del vertical menu expressive; el default de Compose es el baseline de 4dp con `surfaceContainer` | 4.5 | ux |
+| D86 | Leading icon en los items de acción de los menús | **Cerrada:** 24dp en `on_surface_variant` en los items de acción de los cinco menús; los items que son opciones de selección no llevan icono | 4.5 | ux |
 
 ## Detalle por decisión
 
@@ -212,6 +226,60 @@ Cerradas durante la implementación de las iteraciones 3 y 4. Son decisiones que
 - **D70:** el sheet tapa el `SnackbarHost` de la pantalla, y el editor se queda abierto tras el rechazo (D30), así que el mensaje no llegaba a verse. El error se muestra dentro del sheet. La regla afecta al editor de serie de la iteración 5 y al detalle de sesión de la iteración 7, que usan el mismo componente.
 - **D71:** un `RadioButton` dentro de una fila clicable no tiene nombre accesible propio: `uiautomator` lo marca `NAF="true"`. TalkBack lo lee por el `Text` hermano, pero el control por sí solo no lo tiene, y eso no cumple el criterio de "listo". Se arregla con `semantics(mergeDescendants = true)` en la fila. La regla aplica a todos los selectores futuros.
 - **D72:** Lint de Compose obliga a `LocalResources.current` en lugar de `LocalContext.current.getString`, y a `LocalLocale.current.platformLocale` en lugar de `Locale.getDefault()`. No es solo un aviso de estilo: `Locale.getDefault()` no respeta `localeOverride` de D64, que se aplica de forma explícita en Compose. Por eso `outcomeMessage` recibe `Resources`.
+
+### D73. Diálogos según M3 estricto
+
+Cerrada en el rediseño de vistas de Penpot. Los diálogos de las iteraciones 3 y 4 ya implementados se ajustan en la iteración 4.5.
+
+Se elige la lectura estricta del spec de Material 3 como base del diseño para mantener coherencia con el estándar de la industria. La práctica común de destacar la acción principal con un botón filled se descarta: el spec dice que los diálogos usan text buttons porque la ausencia de contenedor unifica la acción con el texto del diálogo. Los dos diálogos rediseñados (creación y confirmación) deben quedar coherentes entre sí, y lo estaban en estructura pero no en el estilo del botón principal.
+
+La regla completa está en `docs/spec/ux.md` (Diálogos).
+
+### D74 a D76. Decisiones del rediseño de vistas (Penpot)
+
+Cerradas en el rediseño de la pantalla de Ejercicios en Penpot, aplicadas en la iteración 4.5.
+
+- **D74:** la fila de chips se descarta porque duplica el acceso al sheet: el icono de filtro dentro de la search bar mantiene la barra como único punto de entrada. La línea de filtro activo solo aparece cuando hay filtro, y el label es el tipo de filtro, no "Filtrando", porque la línea enuncia lo que está activo, no que existe un filtro. El sheet se renombra a "Filtros" porque ahora tiene dos secciones, Categoría y Estado, y Archivados deja de ser un chip. **Revisada por D78:** el argumento se cae cuando el sheet deja de ser el acceso al filtro, y la línea de filtro activo no es un componente del spec.
+- **D75:** el nombre es el texto dominante y la categoría pasa a píldora debajo. La píldora se oculta cuando esa categoría es el filtro activo, porque el chip de categoría de D78 ya enuncia la categoría y la píldora sería redundante en cada fila. El badge Archivado convive en la misma línea de pills.
+- **D76:** la regla anterior decía que la creación no heredaba la categoría del filtro, porque el filtro cambiaba lo que se ve, no lo que se asigna. Con el chip de categoría de D78 la intención queda clara, así que el dropdown de creación se prerrellena con la categoría del filtro activo. El filtro pasa a influir en el valor propuesto sin dejar de ser solo un filtro.
+
+### D77. Crear en Ejercicios como FAB
+
+Cerrada al implementar la iteración 4.5. La regla anterior presentaba el crear como una acción pequeña de la barra, no como un FAB, porque la lista es de filtrar y acceder. Con la search bar de D74 la barra quedó ocupada por el acceso al filtro, así que el crear pasa a un FAB: es la única acción persistente de la pantalla, y el FAB es el contenedor estándar de la acción principal en M3. El estado vacío guiado del board mantiene su botón de crear, que se implementa en su bloque. **Revisada por D80:** el FAB sigue siendo el contenedor, pero pasa a FAB menu, porque la creación de categoría necesitaba un acceso y el menú del chip queda para el CRUD.
+
+### D78 a D82. Rediseño del filtrado sobre el spec de M3
+
+Cerradas al contrastar la pantalla de Ejercicios con el spec de M3, en la iteración 4.5. El board de Penpot se rediseña con estas reglas.
+
+- **D78:** el filtro de contenido se hace con chips, que es el componente que M3 define para filtrar, no con una línea de texto. La línea de filtro activo de D74 era un patrón ad hoc. Además el acceso al filtro en un sheet cuesta dos toques y tapa la lista; con chips es un toque y el contenido sigue visible. El chip de categoría abre un `DropdownMenu` porque el catálogo puede tener muchas categorías y una fila de chips con una chip por categoría no cabe en la ventana compacta. El chip de archivado es un toggle, que es la forma natural de un filtro booleano.
+- **D79:** M3 permite hasta dos trailing icons en la search bar, y el patrón estándar es la X para borrar el texto. La barra de Iron no tenía forma de limpiar la búsqueda: había que borrar carácter a carácter. Se elige un solo icono con doble función, porque las dos acciones no son simultáneas: con texto se borra, con texto vacío se cancela. Dos iconos habrían cargado la barra para un gesto que casi nunca se da en el mismo momento.
+- **D80:** la creación de categoría estaba resuelta como item de acción dentro del sheet, y con D78 el sheet desaparece. Las dos creaciones de la pantalla pasan a un FAB menu: son acciones emparentadas, y M3 define el FAB menu para un grupo de acciones relacionadas. En código se implementa con `FloatingActionButton` + `DropdownMenu` anclado sobre el FAB, porque `FloatingActionButtonMenu` y `ToggleFloatingActionButton` no existen en material3 1.4.0, la versión que fija el BOM 2026.09.00: están en la línea 1.5.0, hoy en beta, y el catálogo de versiones (D20) no fija betas. Es una desviación del componente Expressive, no de la regla.
+- **D81:** el chip de archivado obliga a elegir entre "mostrar archivados" y "solo archivados". Se cierra con excluyente, porque un toggle de dos estados no puede expresar tres, y porque el estado "todos incluidos" obligaría a un tercer valor en el filtro. Se acepta como limitación que con el chip activado no se ve a la vez un ejercicio archivado y uno activo. La regla anterior era inclusiva, y el código la implementaba como inclusiva, así que el DAO cambia.
+- **D82:** el CRUD de categorías estaba pendiente de acceso. Con el chip como acceso al filtro, el menú del chip es el sitio natural: el chip aporta el contexto de la categoría, así que los items de CRUD solo aparecen para la categoría seleccionada. El sheet se elimina. Los diálogos de confirmación con conteo (D40) y de destino de fusión (D32) siguen en la pantalla, no en el menú.
+
+### D83. Píldora de sin categoría en la fila de lista
+
+Cerrada en la iteración 4.5, al contrastar la fila de lista con el spec de M3. Revisa D75 solo para el caso de la píldora de sin categoría.
+
+- **D83:** la píldora de sin categoría se diferenciaba de las pills de categoría solo por el texto, con el mismo contenedor. Se cierra con la pareja neutra `surface_container` + `on_surface_variant`, que es la lectura M3 de un badge de baja énfasis y una pareja válida en la tabla de pairing de la skill. Se descarta `tertiary_container`: diferencia por tono, no por énfasis, y M3 lo reserva para los acentos. Se descarta `surface_container_low`: queda demasiado cerca de `surface` y la píldora apenas se distingue en la lista. Se descarta mantener `on_surface` sobre `surface_container`: da más contraste, pero la píldora se ve menos tenue. La píldora se lee como badge, que es lo que justifica el shape `full`. El contraste de la pareja neutra es 6,56:1 en light y 9,34:1 en dark con la semilla azul acero del board, por encima del mínimo de 4,5:1 de D35, y pendiente de medir en emulador con dynamic color activo. La información no depende solo del color, porque el label enuncia la categoría vacía.
+
+### D84. El menú del chip no lista "Todas"
+
+Cerrada al implementar la fila de chips de D78 en la iteración 4.5. Revisa D78 solo en el contenido del menú.
+
+- **D84:** el item "Todas" se descarta, porque el chip es el acceso al filtro, no una opción de filtrado, y las opciones del menú son categorías: "Todas" no es una categoría, es el estado sin filtro. Ese estado lo enuncia el label del chip, "Categoría", y limpiar es la X del chip. El X es un clicable anidado que TalkBack fusiona dentro del chip, así que la acción se replica como item de menú cuando hay filtro activo, en la línea de D71, para que siga alcanzable. Se descarta dejar solo la X: la acción dependería del comportamiento de TalkBack con los clicables anidados, que no se puede verificar sin emulador.
+
+### D85. El contenedor de los menús
+
+Cerrada al contrastar los menús de Ejercicios con el spec de M3 en la iteración 4.5.
+
+- **D85:** el contenedor del `DropdownMenu` pasa a `large` (16dp) con `surfaceContainerLow`, los valores del vertical menu expressive, que es la variante que M3 recomienda para diseños nuevos. Se descarta el baseline de 4dp con `surfaceContainer`: sigue disponible en el spec, pero es la lectura antigua, y el shape casi cuadrado no encaja con la filosofía de Iron. El default de Compose es el baseline, así que los dos valores se pasan explícitos en los cinco menús de la app. Se descarta implementar el shape morphing de los items: requiere `DropdownMenuGroup` con `MenuDefaults.itemShape`, y los menús de Iron son acciones, no items seleccionables ni submenús. El item se queda en 48dp de target por D35, por encima de los 44dp del spec. La elevación se mantiene en nivel 2, el mismo token del expressive, con la sombra como convención de plataforma. Pendiente de medir el contraste de `on_surface` sobre `surface_container_low` en emulador con dynamic color activo.
+
+### D86. Leading icon en los items de acción de los menús
+
+Cerrada al contrastar los menús con el spec de M3 en la iteración 4.5.
+
+- **D86:** el leading icon es un elemento opcional de la anatomía del menú, y en los menús de Iron ayuda a escanear un grupo de acciones. Se cierra con los valores del spec: 24dp, `on_surface_variant`, 16dp de espacio leading y 12dp de gap hasta el texto, que son también los defaults que Compose aplica en `DropdownMenuItem`, así que no se fuerza tamaño ni color y solo se pasa el slot. Se aplica a los cinco menús por coherencia con D85, que ya los unificó. Se descarta el icono en los items que son opciones de selección, porque no representan una acción y romperían la alineación con el conteo de resultados. Se descarta la librería `material-icons-core`: de los seis glifos solo trae dos, y los otros cinco obligarían a `material-icons-extended`, una dependencia que el propio androidx desaconseja por su tamaño, y el proyecto ya copia los paths de Material Symbols en drawables propios, así que el glifo es el mismo sin la dependencia. El item destructivo no se tiñe con `error`: el spec no define un color de error para los items de menú, y el `error` de D73 es una regla de diálogos. Pendiente de verificar en emulador el ancho del popup con iconos en la ventana compacta, el contraste de `on_surface_variant` sobre `surface_container_low` con dynamic color activo y que TalkBack lea el item solo con el texto.
 
 ## Consecuencias del rediseño de vistas
 

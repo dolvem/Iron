@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-FileCopyrightText: 2026 dolvem -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Leading icon del item de renombrar y editar en los menús (D86). Path de Material Symbols, como los
+  iconos del rediseño de vistas. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3,21V16.75L16.2,3.575Q16.5,3.3T17.262,3.15Q17.663,3.15T18.312,3.6L19.688,5Q19.988,5.275T20.125,6.025Q20.125,6.425T20.425,7.825L7.25,21H3ZM17.6,7.8 19,6.4 17.6,5 16.2,6.4 17.6,7.8Z" />
+</vector>

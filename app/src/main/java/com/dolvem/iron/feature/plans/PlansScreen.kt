@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -54,7 +55,12 @@ import kotlinx.coroutines.launch
 
 // D40: confirmación con conteo de elementos afectados, sin undo en entidades grandes. El conteo lo
 // aporta la preconsulta separada del borrado (D5).
-private data class Confirmation(val title: String, val message: String, val onConfirm: () -> Unit)
+private data class Confirmation(
+    val title: String,
+    val message: String,
+    val destructive: Boolean,
+    val onConfirm: () -> Unit
+)
 
 // Pantalla Planes: lista ordenada por sequence, con los nulos al final, y el plan de hoy resaltado
 // (views.md). El CRUD del plan está en las filas de la lista, como en Ejercicios (D69); el detalle es solo
@@ -89,6 +95,7 @@ fun PlansScreen(onOpenDetail: (Int) -> Unit) {
             confirmation = Confirmation(
                 resources.getString(R.string.plan_delete_title),
                 resources.getQuantityString(R.plurals.confirm_delete_plan, sessions, sessions),
+                destructive = true,
                 onConfirm = {
                     confirmation = null
                     scope.launch { report(viewModel.deletePlan(plan)) }
@@ -97,7 +104,12 @@ fun PlansScreen(onOpenDetail: (Int) -> Unit) {
         }
     }
 
-    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { innerPadding ->
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        // Los insets de la ventana los aplica el Scaffold de IronNavHost; aquí no se reaplican para no
+        // duplicar el hueco superior.
+        contentWindowInsets = WindowInsets(0.dp)
+    ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Row(
                 modifier = Modifier
@@ -156,6 +168,7 @@ fun PlansScreen(onOpenDetail: (Int) -> Unit) {
         ConfirmCountDialog(
             title = pending.title,
             message = pending.message,
+            destructive = pending.destructive,
             onConfirm = pending.onConfirm,
             onDismiss = { confirmation = null }
         )

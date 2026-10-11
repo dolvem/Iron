@@ -4,9 +4,11 @@
 package com.dolvem.iron.feature.plans
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -97,7 +99,10 @@ fun PlanDetailScreen(planId: Int) {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (preselected != null) QuickLogFab { quickLogOpen = true }
-        }
+        },
+        // Los insets de la ventana los aplica el Scaffold de IronNavHost; aquí no se reaplican para no
+        // duplicar el hueco superior.
+        contentWindowInsets = WindowInsets(0.dp)
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Identity(plan, blocked = state.openSession, onEdit = { planFormOpen = true })
@@ -300,30 +305,43 @@ private fun PlanExerciseRowView(row: PlanExerciseRow, blocked: Boolean, onEdit: 
             FieldsLine(row)
         }
 
-        IconButton(onClick = { menuOpen = true }, enabled = !blocked) {
-            Icon(
-                painter = painterResource(R.drawable.ic_row_actions),
-                contentDescription = stringResource(R.string.exercises_row_actions, row.exercise.name)
-            )
-        }
+        // El ancla del DropdownMenu es el padre de composición, así que el Box alrededor del botón es lo que
+        // ancla el menú bajo el icono. Sin el Box el ancla sería la fila completa y el menú abriría en el
+        // borde start, que es el borde izquierdo de la pantalla.
+        Box {
+            IconButton(onClick = { menuOpen = true }, enabled = !blocked) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_row_actions),
+                    contentDescription = stringResource(R.string.exercises_row_actions, row.exercise.name)
+                )
+            }
 
-        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.action_edit)) },
-                onClick = {
-                    menuOpen = false
-                    onEdit()
-                },
-                enabled = !blocked
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.action_delete)) },
-                onClick = {
-                    menuOpen = false
-                    onDelete()
-                },
-                enabled = !blocked
-            )
+            // D85. D86: leading icon decorativo en los items de acción; el nombre accesible lo da el texto.
+            DropdownMenu(
+                expanded = menuOpen,
+                onDismissRequest = { menuOpen = false },
+                shape = MaterialTheme.shapes.large,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_edit)) },
+                    leadingIcon = { Icon(painterResource(R.drawable.ic_edit), null) },
+                    onClick = {
+                        menuOpen = false
+                        onEdit()
+                    },
+                    enabled = !blocked
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_delete)) },
+                    leadingIcon = { Icon(painterResource(R.drawable.ic_delete), null) },
+                    onClick = {
+                        menuOpen = false
+                        onDelete()
+                    },
+                    enabled = !blocked
+                )
+            }
         }
     }
 }

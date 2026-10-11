@@ -6,6 +6,7 @@ package com.dolvem.iron.feature.exercises
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -59,7 +60,10 @@ fun ExerciseDetailScreen(exerciseId: Int) {
         floatingActionButton = {
             // Quick log FAB contextual: preselecciona este ejercicio (views_plan.md).
             QuickLogFab { quickLogOpen = true }
-        }
+        },
+        // Los insets de la ventana los aplica el Scaffold de IronNavHost; aquí no se reaplican para no
+        // duplicar el hueco superior.
+        contentWindowInsets = WindowInsets(0.dp)
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Identity(state, exercise)

@@ -17,7 +17,7 @@ Este documento es el índice. El detalle está repartido por ámbito, y cada dat
 | `docs/spec/views.md` | estructura de vistas: destinos, grafo, pantallas |
 | `docs/spec/ux.md` | UX operativa: comportamiento de la UI |
 | `docs/spec/engineering.md` | stack, paquetes, testing, calidad, distribución |
-| `docs/state/decisions.md` | estado de las decisiones D1–D72 y su justificación |
+| `docs/state/decisions.md` | estado de las decisiones D1–D82 y su justificación |
 | `docs/state/todo.md` | índice de iteraciones con el estado de cada bloque |
 | `docs/iterations/` | un fichero por bloque: checkboxes y notas de verificación |
 | `docs/analysis/flexify_analysis.md` | análisis de Flexify |
